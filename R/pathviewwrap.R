@@ -16,11 +16,14 @@
 #' @return
 #' @export
 #'
-#' @examples
-pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina"){
- dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
+#' @examples pathviewwrap(fq.dir = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw", ref.dir = "~/Documents/Research/UNCC/old/Data/Reference/mouse", phenofile = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw/pheno.txt", outdir="~/Documents/Research/UNCC/Research_rotation-II/newtmp/pathviewwrap/results_withoutref", endness = "SE", entity = "Mus musculus", corenum = 8, diff.tool  = "DESEQ2", compare = "unpaired", seq_tech = "Illumina")
 
- qc.dir <- dirlist[1]
+
+pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
+                         corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina"){
+    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
+
+    qc.dir <- dirlist[1]
     trim.dir <- dirlist[2]
     sampleFile <- dirlist[3]
     genomeFile<- dirlist[4]
