@@ -2,16 +2,16 @@
 
 #' Title
 #'
-#' @param fq.dir
-#' @param ref.dir
-#' @param phenofile
-#' @param outdir
-#' @param endness
-#' @param entity
-#' @param corenum
-#' @param diff.tool
-#' @param compare
-#' @param seq_tech
+#' @param fq.dir : path of folder where raw fastq files are : one fasta per sample
+#' @param ref.dir : path to reference directory which contain reference file(*.fa) and annotation file(*.gtf), can be NULL
+#' @param phenofile : path to phenofile ; see note on test data to see the format of phenofile 
+#' @param outdir  : give the name of parent result dir , this can be existing or not , rest of directory will be formed by program for organization
+#' @param endness : can be “PE” for paired and “SE” for unpaired data
+#' @param entity  : Scientific name of species whose RNA is being analyzed
+#' @param corenum : number of cores available for analysis #defaut 2
+#' @param diff.tool :  what differential tool to to use, “DESEQ2” or “edgeR” available
+#' @param compare : what is sample/experimental design you have, paired or unpaired
+#' @param seq_tech : Illumina, pacbio or nanopore
 #'
 #' @return
 #' @export
@@ -32,14 +32,11 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
 
     run_qc(fq.dir, qc.dir, corenum)
 
-      #call function for quality trimming
+     #call function for quality trimming
     library(parallel)
     #setwd(fq.dir)
     print("calling fastp")
-    #samaplenamelist <- read.csv( sampleFile , header =T, sep ="\t")$SampleName
-    # for (names in samaplenamelist){
-    #   rfastp(read1 = paste0(names, ".fastq"), read2 = "", outputFastq = paste0(names, "_outfastq"), merge = FALSE, adapterFasta= "adapters.fasta", thread = corenum)
-    #         }
+    
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
     clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
