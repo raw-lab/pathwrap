@@ -1,6 +1,6 @@
 
 #' Title
-#'
+#' function to make good data frame for deseq2 and edgeR // git test commit 
 #' @param diff.tool
 #' @param result.dir
 #' @param grp.idx
