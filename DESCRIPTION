@@ -22,6 +22,7 @@ Imports:
     pathview,
     QuasR,
     Rsamtools,
+    Rhisat2,
     stringr
 Depends: 
     R (>= 2.10)
