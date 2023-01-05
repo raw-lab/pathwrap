@@ -21,8 +21,8 @@ if (class(txdb)==  "TxDb"){
   }
 }else{
   library(GenomicFeatures)
-
-  chrLen <- scanFaIndex(genomeFile)
+  
+  chrLen <- Rsamtools::scanFaIndex(genomeFile)
   chrominfo <- data.frame(chrom = as.character(seqnames(chrLen)),
                           length = width(chrLen),
                           is_circular = rep(FALSE, length(chrLen)))
