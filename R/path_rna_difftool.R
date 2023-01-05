@@ -10,6 +10,8 @@
 #'
 #' @return
 #' @export
+#' 
+#' 
 #'
 #' @examples
 run_difftool <- function(diff.tool, result.dir,grp.idx, geneLevels, entity, deseq2.dir){ #make sure correct dir is chosen
