@@ -89,9 +89,11 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   ##############################################################################
 
   if( endness== "SE"){
-    pinfo_string <- ".fastq"
+    #pinfo_string <- ".fastq"
+    pinfo_string <- ".fastq.gz"
   }else{
-    pinfo_string <- "_1.fastq"
+   # pinfo_string <- "_1.fastq"
+    pinfo_string <- "_1.fastq.gz"
   }
   library(stringr)
   FileName <- grep(pinfo_string,list.files(fq.dir, full.names=T) ,value =T)
@@ -102,7 +104,9 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName, SampleName)) ,quote =F ,  col.names=T, row.names=F)
   } else{
     FileName1 <- FileName
-    FileName2 <- str_replace_all(FileName1, "_1.fastq", "_2.fastq")
+    FileName2 <- str_replace_all(FileName1, "_1.fastq.gz", "_2.fastq.gz")
+    
+    #FileName2 <- str_replace_all(FileName1, "_1.fastq", "_2.fastq")
     sampleFile <- file.path(result.dir, "sampleFile.txt")
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName1, FileName2, SampleName)) ,quote =F ,  col.names=T, row.names=F)
   }
