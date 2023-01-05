@@ -1,12 +1,12 @@
 #run fastp
-#' Title
+#' to run trimming
 #'
 #' @param samplename
 #'
 #' @return
 #' @export
 #'
-#' @examples
+#' @examples 
 run_fastp <-function(samplename){
 
   if (seq_tech == "PacBio" | seq_tech == "Nanopore" ){ #use custom adapters
