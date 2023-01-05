@@ -85,7 +85,6 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
 
 
   ### To run qAlign we need samplefile
-  ## TO DO Make sure this works for all types of file name and single and paired end data, bunch of bam files and bunch of fastq files, partially complete
   ##############################################################################
 
   if( endness== "SE"){
