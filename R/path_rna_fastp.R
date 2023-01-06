@@ -53,7 +53,6 @@ run_fastp <-function(samplename){
 
     }
   }
-
   cmd <- stringr::str_replace_all(cmd, "samplename_to_sed", samplename)
   print(cmd)
   system(cmd)
