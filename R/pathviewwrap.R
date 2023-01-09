@@ -22,7 +22,9 @@
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
                          corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina"){
     dirlist <-sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
-    coldata <- dirlist[8:9]
+    coldata <- as.data.frame(dirlist[8:9])
+    rownames(coldata) <- str_remove(coldata$Sample, pattern=".fastq.gz")
+
     dirlist <- unlist(dirlist)
     qc.dir <- dirlist[1]
     trim.dir <- dirlist[2]
