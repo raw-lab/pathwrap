@@ -14,7 +14,7 @@
 #' 
 #'
 #' @examples
-run_difftool <- function(diff.tool, result.dir,grp.idx, geneLevels, entity, deseq2.dir){ #make sure correct dir is chosen
+run_difftool <- function(diff.tool, result.dir,coldata, geneLevels, entity, deseq2.dir){ #make sure correct dir is chosen
   #geneData_my <- as.data.frame(readRDS(file.path(result.dir, "combinedcount.trimmed.RDS"))) #TO DO maybe I can just use geneLevels variable
   library(DESeq2)
   library(edgeR)
@@ -31,22 +31,26 @@ run_difftool <- function(diff.tool, result.dir,grp.idx, geneLevels, entity, dese
     rownames(cnts)<- str_remove(rownames(cnts),"\\.[0-9]+$" )
     cnts<- mol.sum(cnts, id.map = "ENSEMBL", gene.annotpkg =bods[ which(bods[,3]==orgcode)]) #converting to entrez # what if gene id is not ensembl and what if arabidopsis thaliana id.map might be ath or else thing
   }
+  
+  cnts <- cnts[, rownames(coldata)]
+  all(rownames(coldata) == colnames(cnts))
+  ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
+  samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
+  grp.idx <-NULL
+  grp.idx[ref] <- "reference"
+  grp.idx[samp] <- "sample"
 
-  #ref <- which(grp.idx == "reference")
-  #samp <- which(grp.idx == "samples")
-  #grp.idx[ref] <- "reference"
-  #grp.idx[samp] <- "sample"
-
-  if(diff.tool=="edgeR"){
-   exp.fc <- run_edgeR(cnts, grp.idx, edgeR.dir)
-  }
-  else
-  {
-  exp.fc  <-run_deseq2(cnts,grp.idx, deseq2.dir)
-  }
+    if(diff.tool=="edgeR"){
+     exp.fc <- run_edgeR(cnts, grp.idx, edgeR.dir)
+    }
+    else
+    {
+    exp.fc  <-run_deseq2(cnts,grp.idx, deseq2.dir)
+    }
+#  }
 
   ######
   #include bayseq
 
-  return(c(exp.fc, cnts))
+  return(c(exp.fc, cnts, grp.idx))
 }

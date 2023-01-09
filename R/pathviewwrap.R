@@ -51,6 +51,6 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     print("the cluster are done" )
     aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better
     geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
-    exp.fcncnts <-run_difftool(diff.tool = "DESEQ2",outdir, grp.idx, geneLevels, entity, deseq2.dir)
-    run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], grp.idx)
+    exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
+    run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], exp.fcncnts [2]) # see if you can use grp.idx
 }
