@@ -38,7 +38,8 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     #grp.idx <- dirlist[8:length(dirlist)]
 
     if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
-    run_qc(fq.dir, qc.dir, corenum)
+      print("file not found ; running fastqc")
+      run_qc(fq.dir, qc.dir, corenum)
     }
 
      #call function for quality trimming
@@ -55,6 +56,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     stopCluster(cl)
     #make txdb from annotation
     if(!file.exists(paste0(entity, "txdbobj"))){
+      print("file not found; making txdb obj")
       txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
     }
     else{
@@ -62,14 +64,17 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     }
     print("the cluster are done" )
     if(!file.exists(file.path(result.dir, "combinedcount.trimmed.RDS")  )  | (file.exists(file.path(result.dir, "combinedcount.trimmed.RDS") & ncol(readRDS(file.path(result.dir, "combinedcount.trimmed.RDS"))) <=length(read.csv( sampleFile , header =T, sep ="\t")$SampleName)))){  #or if size of file is small with less samples
+      print("combined count not found; running alignemnt and counting")
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
       geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
     }
     if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") & !file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
+      print("Volcano plot not found ; running differential analysis")
       exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
     }
     setwd(gage.dir)
     if(!file.exists("*.txt")){
+      print("running pathway analysis")
       run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], exp.fcncnts [2]) # see if you can use grp.idx
     }
 }
