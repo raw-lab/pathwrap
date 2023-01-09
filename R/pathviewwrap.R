@@ -63,7 +63,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       txdb <- readRDS(paste0(entity, "txdbobj"))
     }
     print("the cluster are done" )
-    if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  )  { #make sure you delete this file before rerunning can be better
+    if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { #make sure you delete this file before rerunning can be better
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
       geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
     }
