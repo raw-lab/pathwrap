@@ -35,7 +35,9 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     #coldata <- dirlist[8:9]
     #grp.idx <- dirlist[8:length(dirlist)]
 
+    if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
     run_qc(fq.dir, qc.dir, corenum)
+    }
 
      #call function for quality trimming
     library(parallel)
@@ -45,14 +47,26 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
     clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
+    
     ans <- parSapply(cl , read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
     print("the trim run is complete")
     stopCluster(cl)
     #make txdb from annotation
+    if(!file.exists(paste0(entity, "txdbobj"))){
     txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
+    }
+    else{
+      txdb <- readRDS(paste0(entity, "txdbobj"))
+    }
     print("the cluster are done" )
-    aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better
+    if(!file.exists(file.path(result.dir, "combinedcount.trimmed.RDS")  )  | (file.exists(file.path(result.dir, "combinedcount.trimmed.RDS") & ncol(readRDS(file.path(result.dir, "combinedcount.trimmed.RDS"))) <=length(read.csv( sampleFile , header =T, sep ="\t")$SampleName)))){  #or if size of file is small with less samples
+    aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
     geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
+    }
+    if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") & !file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
     exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
+    }
+    if(!file.exists("*.txt")){
     run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], exp.fcncnts [2]) # see if you can use grp.idx
+    }
 }

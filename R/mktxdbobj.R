@@ -31,5 +31,6 @@ if (class(txdb)==  "TxDb"){
                           dataSource = "Ensembl",
                           organism = entity)
 }
+saveRDS(txdb, file= paste0(entity, "txdbobj")) #from current working directory #check
 return(txdb)
 }
