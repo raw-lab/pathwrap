@@ -33,7 +33,7 @@ run_difftool <- function(diff.tool, result.dir,coldata, geneLevels, entity, dese
   }
   
   cnts <- cnts[, rownames(coldata)]
-  all(rownames(coldata) == colnames(cnts))
+  if(  all(rownames(coldata) == colnames(cnts)) ){#if this then proceed
   ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
   samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
   grp.idx <-NULL
@@ -47,6 +47,7 @@ run_difftool <- function(diff.tool, result.dir,coldata, geneLevels, entity, dese
     {
     exp.fc  <-run_deseq2(cnts,grp.idx, deseq2.dir)
     }
+  }
   
 
   ######
