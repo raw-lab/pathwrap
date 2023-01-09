@@ -21,8 +21,9 @@
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
                          corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina"){
-    dirlist <- unlist(sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare))
-
+    dirlist <-sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
+    coldata <- dirlist[8:9]
+    dirlist <- unlist(dirlist)
     qc.dir <- dirlist[1]
     trim.dir <- dirlist[2]
     sampleFile <- dirlist[3]
@@ -31,7 +32,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
 
     deseq2.dir <- dirlist[6]
     gage.dir <- dirlist[7]
-    coldata <- dirlist[8:9]
+    #coldata <- dirlist[8:9]
     #grp.idx <- dirlist[8:length(dirlist)]
 
     run_qc(fq.dir, qc.dir, corenum)
