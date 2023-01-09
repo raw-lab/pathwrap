@@ -47,7 +47,7 @@ run_difftool <- function(diff.tool, result.dir,coldata, geneLevels, entity, dese
     {
     exp.fc  <-run_deseq2(cnts,grp.idx, deseq2.dir)
     }
-#  }
+  }
 
   ######
   #include bayseq
