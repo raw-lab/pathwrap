@@ -35,22 +35,22 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
 
     run_qc(fq.dir, qc.dir, corenum)
 
-     #call function for quality trimming
-    library(parallel)
-    #setwd(fq.dir)
-    print("calling fastp")
-    
-    cl <- makeCluster(corenum)
-    seq_tech = seq_tech
-    clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
-    ans <- parSapply(cl , read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
-    print("the trim run is complete")
-    stopCluster(cl)
-    #make txdb from annotation
-    txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
-    print("the cluster are done" )
-    aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better
-    geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
-    exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
-    run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], exp.fcncnts [2]) # see if you can use grp.idx
+    #  #call function for quality trimming
+    # library(parallel)
+    # #setwd(fq.dir)
+    # print("calling fastp")
+    # 
+    # cl <- makeCluster(corenum)
+    # seq_tech = seq_tech
+    # clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
+    # ans <- parSapply(cl , read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
+    # print("the trim run is complete")
+    # stopCluster(cl)
+    # #make txdb from annotation
+    # txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
+    # print("the cluster are done" )
+    # aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better
+    # geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
+    # exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
+    # run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], exp.fcncnts [2]) # see if you can use grp.idx
 }
