@@ -63,7 +63,8 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       txdb <- readRDS(paste0(entity, "txdbobj"))
     }
     print("the cluster are done" )
-    if(!file.exists(file.path(result.dir, "combinedcount.trimmed.RDS")  )  | (file.exists(file.path(result.dir, "combinedcount.trimmed.RDS") & ncol(readRDS(file.path(result.dir, "combinedcount.trimmed.RDS"))) <=length(read.csv( sampleFile , header =T, sep ="\t")$SampleName)))){  #or if size of file is small with less samples
+    if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  )  | (file.exists(file.path(outdir, "combinedcount.trimmed.RDS") & 
+                                                                                      ncol(readRDS(file.path(outdir, "combinedcount.trimmed.RDS"))) <=length(read.csv( sampleFile , header =T, sep ="\t")$SampleName)))){  #or if size of file is small with less samples
       print("combined count not found; running alignemnt and counting")
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
       geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
