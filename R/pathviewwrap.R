@@ -21,8 +21,9 @@
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
                          corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina"){
-    dirlist <-sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
-    coldata <- as.data.frame(dirlist[8:9])
+    
+    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
+    coldata <- as.data.frame(dirlist[9:10])
     rownames(coldata) <- str_remove(coldata$Sample, pattern=".fastq.gz")
 
     dirlist <- unlist(dirlist)
@@ -33,7 +34,8 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     geneAnnotation <- dirlist[5]
 
     deseq2.dir <- dirlist[6]
-    gage.dir <- dirlist[7]
+    edger.dir <- dirlist[7]
+    gage.dir <- dirlist[8]
     #coldata <- dirlist[8:9]
     #grp.idx <- dirlist[8:length(dirlist)]
 
@@ -67,9 +69,13 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
       geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
     }
-    if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") & !file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
+    if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") )#& !file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
       print("Volcano plot not found ; running differential analysis")
       exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
+    }
+    if(!file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
+      print("Volcano plot not found ; running differential analysis")
+      exp.fcncnts <- run_difftool(diff.tool = "edgeR",outdir,coldata, geneLevels, entity, edger.dir)
     }
     setwd(gage.dir)
     if(!file.exists("*.txt")){

@@ -142,6 +142,6 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     geneAnnotation <- list.files(ref.dir, ".gtf$", full.names = T) #could be changed to include one of gtf, gff etc, check with quasR package
 
   }
-  return (c(qc.dir,trim.dir,sampleFile, genomeFile, geneAnnotation, deseq2.dir,gage.dir, coldata))
+  return (c(qc.dir,trim.dir,sampleFile, genomeFile, geneAnnotation, deseq2.dir, edger.dir, gage.dir, coldata))
 }
 
