@@ -13,15 +13,15 @@ run_qc <- function(fq.dir, qc.dir, corenum){
   library(fastqcr)
   library(ggplot2)
   #install fastqc if system( "which fastqc", intern = T) fails
-  if (Sys.which("fastqc")=="" & !file.exists(paste0(qc.dir, "/FastQC/fastqc") ){
+  if (Sys.which("fastqc")=="" & !file.exists(paste0(qc.dir, "/FastQC/fastqc"))){
     ## work here
     fastqcr::fastqc_install(dest.dir = qc.dir)
     fastqc.path <- paste0(qc.dir, "/FastQC/fastqc")
-  }
+   }
     else{
       fastqc.path <- Sys.which("fastqc")
     }
-  fastqcr::fastqc(fq.dir, qc.dir, threads =8,fastqc.path =fastqc.path)
+   fastqcr::fastqc(fq.dir, qc.dir, threads =8,fastqc.path =fastqc.path)
   
    qc <- qc_aggregate(qc.dir)
    tiff(file.path(qc.dir,"total_seq.tiff") ,units="in", width=15, height=15, res=300)

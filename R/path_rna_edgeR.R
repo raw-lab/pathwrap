@@ -9,9 +9,7 @@
 #' @export
 #'
 #' @examples
-run_edgeR <- function(cnts,grp.idx, edgeR.dir){
-  if(diff.tool=="edgeR"){
-    ###########################################################################################################################################
+run_edgeR <- function(cnts,grp.idx, edger.dir){
     library(edgeR)
     dgel <- edgeR::DGEList(counts=cnts, group=factor(grp.idx))
     dgel <- edgeR::calcNormFactors(dgel)
@@ -26,6 +24,6 @@ run_edgeR <- function(cnts,grp.idx, edgeR.dir){
     plot(EnhancedVolcano::EnhancedVolcano(et$table, x ='logFC', y="PValue", lab=rownames(et$table)))
     dev.off()
     return(exp.fc)
-  }
+  
   ######
 }

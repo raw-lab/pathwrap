@@ -20,7 +20,7 @@
 
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
-                         corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
+                         corenum = 8,  compare="unpaired", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
   
   ###if replace is true, check if check files are present and delete checkfiles and associated data(all result folders?)
     
@@ -43,7 +43,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
 
     if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
       print("file not found ; running fastqc")
-      run_qc(fq.dir, qc.dir, corenum)
+      #run_qc(fq.dir, qc.dir, corenum)
     }
 
      #call function for quality trimming
@@ -64,7 +64,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity, outdir)
     }
     else{
-      txdb <- AnnotationDbi::loadDb(paste0(entity, "txdbobj"))
+      txdb <- AnnotationDbi::loadDb(paste0(outdir, gsub(" ", "", entity), "_txdbobj"))
     }
     print("the cluster are done" )
     if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { 
@@ -73,14 +73,17 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       # why is this not recognizing alignemtn already present
       geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
     }
+    else{
+      geneLevels <- as.data.frame(readRDS(file.path(outdir, "combinedcount.trimmed.RDS") )) #check
+    }
     if (keep_tmp == FALSE){
       unlink(file.path(outdir, "aligned_bam", "*bam*"))
       }
-    if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") ){
+    if(!file.exists(paste0(deseq2.dir, "/Volcano_deseq2.tiff"))){
       print("Volcano plot not found ; running differential analysis")
       exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
     }
-    if(!file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
+    if(!file.exists(paste0(edger.dir, "edgeR_Volcano_edgeR.tiff"))){
       print("Volcano plot not found ; running differential analysis")
       exp.fcncnts <- run_difftool(diff.tool = "edgeR",outdir,coldata, geneLevels, entity, edger.dir)
     }

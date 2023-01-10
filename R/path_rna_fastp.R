@@ -45,6 +45,7 @@ run_fastp <-function(samplename){
                     file.path(trim.dir ,  "samplename_to_sed.json"))
 
     } else {
+      print("fastp running for single end illumina running")
       cmd <- paste0("fastp -i ",
                     file.path(fq.dir , "samplename_to_sed.fastq.gz"), " -o ",
                     file.path(trim.dir , "samplename_to_sed_paired.fastq.gz"), " -h " ,
@@ -55,6 +56,7 @@ run_fastp <-function(samplename){
   }
   cmd <- stringr::str_replace_all(cmd, "samplename_to_sed", samplename)
   print(cmd)
+  print(paste0(file.path(trim.dir , stringr::str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename))))
   if(!file.exists(file.path(trim.dir , stringr::str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename)))){
     message(paste0(file.path(trim.dir , stringr::str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename), "does not exit")))
     system(cmd)
