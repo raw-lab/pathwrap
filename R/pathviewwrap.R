@@ -20,7 +20,7 @@
 
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
-                         corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina"){
+                         corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina", keep_tmp = FALSE){
     
     dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
     coldata <- as.data.frame(dirlist[9:10])
@@ -59,16 +59,21 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     #make txdb from annotation
     if(!file.exists(paste0(entity, "txdbobj"))){
       print("file not found; making txdb obj")
-      txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
+      txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity, outdir)
     }
     else{
       txdb <- AnnotationDbi::loadDb(paste0(entity, "txdbobj"))
     }
     print("the cluster are done" )
-    if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { #make sure you delete this file before rerunning can be better
+    if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { 
+      setwd(outdir)#make sure you delete this file before rerunning can be better
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
+      # why is this not recognizing alignemtn already present
       geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
     }
+    if (keep_tmp = FALSE){
+      unlink(file.path(outdir, "aligned_bam", "*bam*"))
+      }
     if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") )#& !file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
       print("Volcano plot not found ; running differential analysis")
       exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)

@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-make_txdbobj <- function(geneAnnotation, corenum, genomeFile, entity){
+make_txdbobj <- function(geneAnnotation, corenum, genomeFile, entity, outdir){
 txdb <- try(loadDb(geneAnnotation), silent = T)
 cl2 <- makeCluster(corenum)
 if (class(txdb)==  "TxDb"){
@@ -31,6 +31,6 @@ if (class(txdb)==  "TxDb"){
                           dataSource = "Ensembl",
                           organism = entity)
 }
-AnnotationDbi::saveDb(txdb, file= paste0(entity, "txdbobj")) #from current working directory #check
+AnnotationDbi::saveDb(txdb, file= paste0(outdir, gsub(" ", "", entity), "_txdbobj")) #from current working directory #check
 return(txdb)
 }
