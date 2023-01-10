@@ -73,10 +73,10 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       # why is this not recognizing alignemtn already present
       geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
     }
-    if (keep_tmp = FALSE){
+    if (keep_tmp == FALSE){
       unlink(file.path(outdir, "aligned_bam", "*bam*"))
       }
-    if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") )#& !file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
+    if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") ){
       print("Volcano plot not found ; running differential analysis")
       exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
     }

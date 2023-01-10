@@ -24,7 +24,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   #Check if files/folders  exists and create if not
   ##
   #################################################################
-  if (file.exists(outdir) & rerun = T){
+  if (file.exists(outdir) & rerun == T){
     unlink(outdir, recursive = T)
   }
   
