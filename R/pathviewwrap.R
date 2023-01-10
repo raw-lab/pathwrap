@@ -60,7 +60,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
     }
     else{
-      txdb <- readRDS(paste0(entity, "txdbobj"))
+      txdb <- AnnotationDbi::loadDb(paste0(entity, "txdbobj"))
     }
     print("the cluster are done" )
     if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { #make sure you delete this file before rerunning can be better
