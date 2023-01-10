@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare){
+sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare, rerun){
 
   library(stringr)
 
@@ -24,7 +24,10 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   #Check if files/folders  exists and create if not
   ##
   #################################################################
-
+  if (file.exists(outdir) & rerun = T){
+    unlink(outdir, recursive = T)
+  }
+  
   if (!file.exists(outdir)){
     # default output file
     dir.create(outdir)

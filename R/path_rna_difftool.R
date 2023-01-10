@@ -14,11 +14,9 @@
 #' 
 #'
 #' @examples
-run_difftool <- function(diff.tool, result.dir,coldata, geneLevels, entity, deseq2.dir){ #make sure correct dir is chosen
-  #geneData_my <- as.data.frame(readRDS(file.path(result.dir, "combinedcount.trimmed.RDS"))) #TO DO maybe I can just use geneLevels variable
+run_difftool <- function(diff.tool, result.dir,coldata, geneLevels, entity, deseq2.dir){ #check if this function can be merged to count
   library(DESeq2)
   library(edgeR)
-    #setwd("/scratch/edhungel/Rsubread/script")
   geneData_my <- geneLevels
   library(gage)
   library(pathview)

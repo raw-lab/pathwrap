@@ -20,9 +20,11 @@
 
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
-                         corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina", keep_tmp = FALSE){
+                         corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
+  
+  ###if replace is true, check if check files are present and delete checkfiles and associated data(all result folders?)
     
-    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
+    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare, rerun)
     coldata <- as.data.frame(dirlist[9:10])
     rownames(coldata) <- str_remove(coldata$Sample, pattern=".fastq.gz")
 
