@@ -21,8 +21,11 @@
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
                          corenum = 8, diff.tool="DESEQ2", compare="unpaired", seq_tech="Illumina"){
-    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
+    dirlist <-sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare)
+    coldata <- as.data.frame(dirlist[8:9])
+    rownames(coldata) <- str_remove(coldata$Sample, pattern=".fastq.gz")
 
+    dirlist <- unlist(dirlist)
     qc.dir <- dirlist[1]
     trim.dir <- dirlist[2]
     sampleFile <- dirlist[3]
@@ -31,26 +34,46 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
 
     deseq2.dir <- dirlist[6]
     gage.dir <- dirlist[7]
-    grp.idx <- dirlist[8:length(dirlist)]
+    #coldata <- dirlist[8:9]
+    #grp.idx <- dirlist[8:length(dirlist)]
 
-    run_qc(fq.dir, qc.dir, corenum)
+    if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
+      print("file not found ; running fastqc")
+      run_qc(fq.dir, qc.dir, corenum)
+    }
 
      #call function for quality trimming
     library(parallel)
     #setwd(fq.dir)
     print("calling fastp")
-    
+
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
     clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
+    
     ans <- parSapply(cl , read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
     print("the trim run is complete")
     stopCluster(cl)
     #make txdb from annotation
-    txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
+    if(!file.exists(paste0(entity, "txdbobj"))){
+      print("file not found; making txdb obj")
+      txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity)
+    }
+    else{
+      txdb <- readRDS(paste0(entity, "txdbobj"))
+    }
     print("the cluster are done" )
-    aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better
-    geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
-    exp.fcncnts <-run_difftool(diff.tool = "DESEQ2",outdir, grp.idx, geneLevels, entity, deseq2.dir)
-    run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], grp.idx)
+    if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { #make sure you delete this file before rerunning can be better
+      aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
+      geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
+    }
+    if(!file.exists(deseq2.dir, "Volcano_deseq2.tiff") & !file.exists(edger.dir, "edgeR_Volcano_edgeR.tiff")){
+      print("Volcano plot not found ; running differential analysis")
+      exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
+    }
+    setwd(gage.dir)
+    if(!file.exists("*.txt")){
+      print("running pathway analysis")
+      run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], exp.fcncnts [2]) # see if you can use grp.idx
+    }
 }

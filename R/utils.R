@@ -42,14 +42,14 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     print("Please make sure class information is in cloumn 2 with colname 'Class' . ")
   }
   coldata$Class <- as.factor(coldata$Class)
-  ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
-  samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
-  grp.idx <-NULL
-  grp.idx[ref] <- "reference"
-  grp.idx[samp] <- "sample"
-  ##TO DO write something to automatically determine paired infromation, rev/fr etc
-  print("this is first grp.idx")
-  print(grp.idx)
+  # ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
+  # samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
+  # grp.idx <-NULL
+  # grp.idx[ref] <- "reference"
+  # grp.idx[samp] <- "sample"
+  ##TO DO write something to automatically determine paired information, rev/fr etc
+  #print("this is first grp.idx")
+  #print(grp.idx)
   #check and create dir for organizing results
   checkcretdir <- function(parentname, dirname){
     if(!file.exists(file.path(parentname, dirname))) {
@@ -85,13 +85,14 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
 
 
   ### To run qAlign we need samplefile
-  ## TO DO Make sure this works for all types of file name and single and paired end data, bunch of bam files and bunch of fastq files, partially complete
   ##############################################################################
 
   if( endness== "SE"){
-    pinfo_string <- ".fastq"
+    #pinfo_string <- ".fastq"
+    pinfo_string <- ".fastq.gz"
   }else{
-    pinfo_string <- "_1.fastq"
+   # pinfo_string <- "_1.fastq"
+    pinfo_string <- "_1.fastq.gz"
   }
   library(stringr)
   FileName <- grep(pinfo_string,list.files(fq.dir, full.names=T) ,value =T)
@@ -102,7 +103,9 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName, SampleName)) ,quote =F ,  col.names=T, row.names=F)
   } else{
     FileName1 <- FileName
-    FileName2 <- str_replace_all(FileName1, "_1.fastq", "_2.fastq")
+    FileName2 <- str_replace_all(FileName1, "_1.fastq.gz", "_2.fastq.gz")
+    
+    #FileName2 <- str_replace_all(FileName1, "_1.fastq", "_2.fastq")
     sampleFile <- file.path(result.dir, "sampleFile.txt")
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName1, FileName2, SampleName)) ,quote =F ,  col.names=T, row.names=F)
   }
@@ -139,6 +142,6 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     geneAnnotation <- list.files(ref.dir, ".gtf$", full.names = T) #could be changed to include one of gtf, gff etc, check with quasR package
 
   }
-  return (c(qc.dir,trim.dir,sampleFile, genomeFile, geneAnnotation, deseq2.dir,gage.dir, grp.idx))
+  return (c(qc.dir,trim.dir,sampleFile, genomeFile, geneAnnotation, deseq2.dir,gage.dir, coldata))
 }
 
