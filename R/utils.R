@@ -8,14 +8,13 @@
 #' @param endness
 #' @param entity
 #' @param corenum
-#' @param diff.tool
 #' @param compare
 #'
 #' @return
 #' @export
 #'
 #' @examples
-sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare, rerun){
+sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun){
 
   library(stringr)
 

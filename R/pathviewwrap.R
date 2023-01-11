@@ -20,11 +20,11 @@
 
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
-                         corenum = 8,  compare="unpaired", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
+                         corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
   
   ###if replace is true, check if check files are present and delete checkfiles and associated data(all result folders?)
     
-    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare, rerun)
+    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun)
     coldata <- as.data.frame(dirlist[9:10])
     rownames(coldata) <- str_remove(coldata$Sample, pattern=".fastq.gz")
 
@@ -71,25 +71,32 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       setwd(outdir)#make sure you delete this file before rerunning can be better
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
       # why is this not recognizing alignemtn already present
-      geneLevels <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb)
+      cnts <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb, entity, coldata)
     }
     else{
-      geneLevels <- as.data.frame(readRDS(file.path(outdir, "combinedcount.trimmed.RDS") )) #check
+      cnts <- as.data.frame(readRDS(file.path(outdir, "combinedcount.trimmed.RDS") )) #check
     }
+    grp.idx <- cnts[2] 
     if (keep_tmp == FALSE){
       unlink(file.path(outdir, "aligned_bam", "*bam*"))
       }
     if(!file.exists(paste0(deseq2.dir, "/Volcano_deseq2.tiff"))){
       print("Volcano plot not found ; running differential analysis")
-      exp.fcncnts <- run_difftool(diff.tool = "DESEQ2",outdir,coldata, geneLevels, entity, deseq2.dir)
+      exp.fcncnts.deseq2 <- run_deseq2(cnts[1],grp.idx, deseq2.dir)
     }
     if(!file.exists(paste0(edger.dir, "edgeR_Volcano_edgeR.tiff"))){
       print("Volcano plot not found ; running differential analysis")
-      exp.fcncnts <- run_difftool(diff.tool = "edgeR",outdir,coldata, geneLevels, entity, edger.dir)
+      exp.fcncnts.edger <- run_edgeR(cnts[1],grp.idx, edger.dir)
     }
     setwd(gage.dir)
+    if(diff.tool == "DESeq2"){
+      exp.fc <- exp.fcncnts.deseq2
+    }
+    else{
+      exp.fc <- exp.fcncnts.edger
+    }
     if(!file.exists("*.txt")){
       print("running pathway analysis")
-      run_pathway(entity,exp.fcncnts [1] , compare, gage.dir, exp.fcncnts [2], exp.fcncnts [2]) # see if you can use grp.idx
-    }
+      run_pathway(entity,exp.fc, compare, gage.dir, cnts[1], grp.idx) 
+      }
 }

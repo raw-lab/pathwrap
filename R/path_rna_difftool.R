@@ -14,38 +14,38 @@
 #' 
 #'
 #' @examples
-run_difftool <- function(diff.tool, result.dir,coldata, geneLevels, entity, deseq2.dir){ #check if this function can be merged to count
-  library(DESeq2)
-  library(edgeR)
-  geneData_my <- geneLevels
-  library(gage)
-  library(pathview)
-  cnts <- geneData_my[,-1]
-  kegg.gs.species <- kegg.gsets(entity)
-  orgcode<- kegg.species.code(entity)
-  data(bods)
-  #if(!all(rownames(cnts)%in% unlist(unname(kegg.gs.species$kg.sets)))){ #check if the use of "all" is appropriate
-  if(sum(rownames(cnts)%in% unlist(unname(kegg.gs.species$kg.sets)) ) < 10){
-    rownames(cnts)<- str_remove(rownames(cnts),"\\.[0-9]+$" )
-    cnts<- mol.sum(cnts, id.map = "ENSEMBL", gene.annotpkg =bods[ which(bods[,3]==orgcode)]) #converting to entrez # what if gene id is not ensembl and what if arabidopsis thaliana id.map might be ath or else thing
-  }
-  
-  cnts <- cnts[, rownames(coldata)]
-  if(  all(rownames(coldata) == colnames(cnts)) ){#if this then proceed
-  ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
-  samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
-  grp.idx <-NULL
-  grp.idx[ref] <- "reference"
-  grp.idx[samp] <- "sample"
+run_difftoolxyz <- function(diff.tool, result.dir,coldata, geneLevels, entity, onedifftool.dir){ #check if this function can be merged to count
+  # library(DESeq2)
+  # library(edgeR)
+  # geneData_my <- geneLevels
+  # library(gage)
+  # library(pathview)
+  # cnts <- geneData_my[,-1]
+  # kegg.gs.species <- kegg.gsets(entity)
+  # orgcode<- kegg.species.code(entity)
+  # data(bods)
+  # #if(!all(rownames(cnts)%in% unlist(unname(kegg.gs.species$kg.sets)))){ #check if the use of "all" is appropriate
+  # if(sum(rownames(cnts)%in% unlist(unname(kegg.gs.species$kg.sets)) ) < 10){
+  #   rownames(cnts)<- str_remove(rownames(cnts),"\\.[0-9]+$" )
+  #   cnts<- mol.sum(cnts, id.map = "ENSEMBL", gene.annotpkg =bods[ which(bods[,3]==orgcode)]) #converting to entrez # what if gene id is not ensembl and what if arabidopsis thaliana id.map might be ath or else thing
+  # }
+  # 
+  # cnts <- cnts[, rownames(coldata)]
+  # if(  all(rownames(coldata) == colnames(cnts)) ){#if this then proceed
+  # ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
+  # samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
+  # grp.idx <-NULL
+  # grp.idx[ref] <- "reference"
+  # grp.idx[samp] <- "sample"
 
     if(diff.tool=="edgeR"){
-     exp.fc <- run_edgeR(cnts, grp.idx, edgeR.dir)
+     exp.fc <- run_edgeR(cnts, grp.idx, onedifftool.dir)
     }
     else
     {
-    exp.fc  <-run_deseq2(cnts,grp.idx, deseq2.dir)
+    exp.fc  <-run_deseq2(cnts,grp.idx, onedifftool.dir)
     }
-  }
+  
   
 
   ######
