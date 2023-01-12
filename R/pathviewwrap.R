@@ -40,7 +40,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
    
     if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
       print("STEP 1 ; running fastqc")
-      #run_qc(fq.dir, qc.dir, corenum)
+      run_qc(fq.dir, qc.dir, corenum)
     }
 
    
