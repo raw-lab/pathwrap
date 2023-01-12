@@ -22,9 +22,9 @@
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
                          corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
   
-  ###if replace is true, check if check files are present and delete checkfiles and associated data(all result folders?)
-    
+
     dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun)
+    
     coldata <- as.data.frame(dirlist[9:10])
     rownames(coldata) <- str_remove(coldata$Sample, pattern=".fastq.gz")
 
@@ -34,23 +34,17 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     sampleFile <- dirlist[3]
     genomeFile<- dirlist[4]
     geneAnnotation <- dirlist[5]
-
     deseq2.dir <- dirlist[6]
     edger.dir <- dirlist[7]
     gage.dir <- dirlist[8]
-    #coldata <- dirlist[8:9]
-    #grp.idx <- dirlist[8:length(dirlist)]
-
+   
     if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
-      print("file not found ; running fastqc")
+      print("STEP 1 ; running fastqc")
       #run_qc(fq.dir, qc.dir, corenum)
     }
 
-     #call function for quality trimming
-    library(parallel)
-    #setwd(fq.dir)
+   
     print("calling fastp")
-
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
     clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
@@ -59,44 +53,66 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     print("the trim run is complete")
     stopCluster(cl)
     #make txdb from annotation
-    if(!file.exists(paste0(entity, "txdbobj"))){
-      print("file not found; making txdb obj")
+    
+    if(!file.exists(paste0(outdir, gsub(" ", "", entity), "_txdbobj"))){
+      print("STEP 2; making txdb obj")
       txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity, outdir)
     }
     else{
       txdb <- AnnotationDbi::loadDb(paste0(outdir, gsub(" ", "", entity), "_txdbobj"))
     }
-    print("the cluster are done" )
+    
     if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { 
       setwd(outdir)#make sure you delete this file before rerunning can be better
+      print("STEP 3 : aligning the sequence")
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
       # why is this not recognizing alignemtn already present
-      cnts <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb, entity, coldata)
+      print("STEP 4: counting aligned sequences")
+      returnlistcntsindx <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb, entity, coldata)
+      cnts <- returnlistcntsindx$cnts
+      grp.idx <- returnlistcntsindx$grp.idx
     }
     else{
       cnts <- as.data.frame(readRDS(file.path(outdir, "combinedcount.trimmed.RDS") )) #check
-    }
-    grp.idx <- cnts[2] 
-    if (keep_tmp == FALSE){
-      unlink(file.path(outdir, "aligned_bam", "*bam*"))
+      if(  all(rownames(coldata) == colnames(cnts)) ){#if this then proceed
+        ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
+        samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
+        grp.idx <-NULL
+        grp.idx[ref] <- "reference"
+        grp.idx[samp] <- "sample"
+      
       }
+    }
+   
+    if (keep_tmp == FALSE){
+      print("deleting aligned bam files, bam file index and log files")
+      unlink(file.path(outdir, "aligned_bam", "*bam*"))
+    }
+
     if(!file.exists(paste0(deseq2.dir, "/Volcano_deseq2.tiff"))){
-      print("Volcano plot not found ; running differential analysis")
-      exp.fcncnts.deseq2 <- run_deseq2(cnts[1],grp.idx, deseq2.dir)
-    }
-    if(!file.exists(paste0(edger.dir, "edgeR_Volcano_edgeR.tiff"))){
-      print("Volcano plot not found ; running differential analysis")
-      exp.fcncnts.edger <- run_edgeR(cnts[1],grp.idx, edger.dir)
-    }
-    setwd(gage.dir)
-    if(diff.tool == "DESeq2"){
-      exp.fc <- exp.fcncnts.deseq2
+      print("STEP 5a ; running differential analysis using DESeq2")
+      exp.fcncnts.deseq2 <- run_deseq2(cnts,grp.idx, deseq2.dir)
     }
     else{
+      exp.fcncnts.deseq2  <- read.table(file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"), header = T, sep = "\t", row.names = 1)
+    }
+    if(!file.exists(paste0(edger.dir, "Volcano_edgeR.tiff"))){
+      print("STEP 5b ; running differential analysis using edgeR")
+      exp.fcncnts.edger <- run_edgeR(cnts,grp.idx, edger.dir)
+    } else{
+      exp.fcncnts.deseq2  <- read.table(file.path(edger.dir, "edgeR_logfoldchange.txt"), header = T, sep = "\t", row.names = 1)
+    }
+    
+    setwd(gage.dir)
+    #chosing to use deseq2 result or edger result for gage
+    if(diff.tool == "DESeq2"){
+      exp.fc <- exp.fcncnts.deseq2
+    } else{
       exp.fc <- exp.fcncnts.edger
     }
     if(!file.exists("*.txt")){
-      print("running pathway analysis")
-      run_pathway(entity,exp.fc, compare, gage.dir, cnts[1], grp.idx) 
+      print("STEP 6 : running pathway analysis using GAGE")
+      print(paste0(compare, "this is from pathviewwrap"))
+      run_pathway(entity,exp.fc, compare, gage.dir, cnts, grp.idx) 
       }
 }

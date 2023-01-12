@@ -58,8 +58,8 @@ run_fastp <-function(samplename){
   print(cmd)
   print(paste0(file.path(trim.dir , stringr::str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename))))
   if(!file.exists(file.path(trim.dir , stringr::str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename)))){
-    message(paste0(file.path(trim.dir , stringr::str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename), "does not exit")))
-    system(cmd)
+    print("STEP 1b : running fastp")
+        system(cmd)
   }
 
 }

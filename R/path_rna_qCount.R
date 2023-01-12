@@ -21,7 +21,7 @@ run_qCount <- function(genomeFile, geneAnnotation, aligned_proj,corenum, result.
   library(parallel)
   cl2 <- makeCluster(corenum)
   geneLevels <- QuasR::qCount(aligned_proj, txdb, reportLevel ="gene", clObj=cl2)
-  saveRDS(geneLevels, file.path(result.dir, "combinedcount.trimmed.RDS"))
+  #saveRDS(geneLevels, file.path(result.dir, "combinedcount.trimmed.RDS"))
   
   library(DESeq2)
   library(edgeR)
@@ -40,7 +40,7 @@ run_qCount <- function(genomeFile, geneAnnotation, aligned_proj,corenum, result.
   }
   
   cnts <- cnts[, rownames(coldata)]
-  saveRDS(geneLevels, file.path(result.dir, "combinedcount.trimmed.RDS"))
+  saveRDS(cnts, file.path(result.dir, "combinedcount.trimmed.RDS"))
   
   if(  all(rownames(coldata) == colnames(cnts)) ){#if this then proceed
     ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
@@ -52,5 +52,8 @@ run_qCount <- function(genomeFile, geneAnnotation, aligned_proj,corenum, result.
   else{
     message("make sure pheno file have only samples analysed")
   }
-  return(c(cnts, grp.idx))
+  #print("this is the counts data")
+ #print( head(cnts))
+  countreturnlist <- list("cnts" = cnts , "grp.idx"= grp.idx)
+  return(countreturnlist )
 }

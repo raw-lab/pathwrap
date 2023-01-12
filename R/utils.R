@@ -17,11 +17,9 @@
 sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun){
 
   library(stringr)
-
-  #################################################################
-  ##
+  library(parallel)
+  library(pathview)
   #Check if files/folders  exists and create if not
-  ##
   #################################################################
   if (file.exists(outdir) & rerun == T){
     unlink(outdir, recursive = T)
@@ -32,7 +30,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     dir.create(outdir)
   }
   result.dir <- outdir
-  #print("The results will be organized in ",result.dir)
+  print(paste0("The results will be organized in ",result.dir))
 
   # make sure the second column is class and first column is sample name
   # make sure file is tab seperated
@@ -44,14 +42,6 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     print("Please make sure class information is in cloumn 2 with colname 'Class' . ")
   }
   coldata$Class <- as.factor(coldata$Class)
-  # ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
-  # samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
-  # grp.idx <-NULL
-  # grp.idx[ref] <- "reference"
-  # grp.idx[samp] <- "sample"
-  ##TO DO write something to automatically determine paired information, rev/fr etc
-  #print("this is first grp.idx")
-  #print(grp.idx)
   #check and create dir for organizing results
   checkcretdir <- function(parentname, dirname){
     if(!file.exists(file.path(parentname, dirname))) {
@@ -85,7 +75,6 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   kegg.dir <- KEGG
   go.dir <- GO
 
-
   ### To run qAlign we need samplefile
   ##############################################################################
 
@@ -106,19 +95,16 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   } else{
     FileName1 <- FileName
     FileName2 <- str_replace_all(FileName1, "_1.fastq.gz", "_2.fastq.gz")
-    
-    #FileName2 <- str_replace_all(FileName1, "_1.fastq", "_2.fastq")
     sampleFile <- file.path(result.dir, "sampleFile.txt")
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName1, FileName2, SampleName)) ,quote =F ,  col.names=T, row.names=F)
   }
-
-
 
   #References
   #if only species name is given and both geneAnnotation and genome is NULL
   if( is.na(ref.dir)){
     #ref_info <- read.table("data/species_genome_annotation_pkg", sep = "\t", header = T, na.strings=c(""," ","NA")) #this file is supplied with script
     #ref_info <- as.data.frame(readRDS("data/anntpkglist.RDS"))#, sep = "\t", header = T, na.strings=c(""," ","NA")) #this file is supplied with script
+    data(anntpkglist, package = "pathviewwrap")
     ref_info <- anntpkglist
 
     species_no <- which(ref_info$species==entity)
@@ -127,7 +113,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
 
     ###make sure both annot and genome package is installed for the species
     # (set of genome and annotation pkg come from developers list)
-
+    #annotation pkg installation
     pkg.on = require(annotate_pkg, character.only = TRUE, lib.loc = .libPaths()[1])
     if (!pkg.on) {
       if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -138,7 +124,13 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
         stop(paste("Fail to install/load gene annotation package ",annotate_pkg, "!", sep = ""))
     }
     geneAnnotation <-  file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite" ) )
+    
+    #genome file installation
     genomeFile <- genome_pkg
+    pkg.on = require(genome_pkg, character.only = TRUE, lib.loc = .libPaths()[1])
+    if (!pkg.on) {
+      BiocManager::install(genome_pkg,force = T, suppressUpdates =TRUE, lib.loc = .libPaths()[1] )
+      }
   } else {
     genomeFile <- list.files(ref.dir, ".fa$", full.names= T)
     geneAnnotation <- list.files(ref.dir, ".gtf$", full.names = T) #could be changed to include one of gtf, gff etc, check with quasR package
