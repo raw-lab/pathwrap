@@ -71,6 +71,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   trim.log <- fastp_log
   pathway.dir <- pathway_analysis
   edger.dir <- edgeR
+  print(edger.dir)
   deseq2.dir <- DESeq2
   kegg.dir <- KEGG
   go.dir <- GO

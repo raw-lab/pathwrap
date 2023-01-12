@@ -32,7 +32,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     qc.dir <- dirlist[1]
     trim.dir <- dirlist[2]
     sampleFile <- dirlist[3]
-    genomeFile<- dirlist[4]
+    genomeFile <- dirlist[4]
     geneAnnotation <- dirlist[5]
     deseq2.dir <- dirlist[6]
     edger.dir <- dirlist[7]
@@ -48,17 +48,15 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
     clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
-    
     ans <- parSapply(cl , read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
     print("the trim run is complete")
     stopCluster(cl)
-    #make txdb from annotation
     
+    #make txdb from annotation
     if(!file.exists(paste0(outdir, gsub(" ", "", entity), "_txdbobj"))){
       print("STEP 2; making txdb obj")
       txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity, outdir)
-    }
-    else{
+    } else{
       txdb <- AnnotationDbi::loadDb(paste0(outdir, gsub(" ", "", entity), "_txdbobj"))
     }
     
@@ -92,20 +90,26 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     if(!file.exists(paste0(deseq2.dir, "/Volcano_deseq2.tiff"))){
       print("STEP 5a ; running differential analysis using DESeq2")
       exp.fcncnts.deseq2 <- run_deseq2(cnts,grp.idx, deseq2.dir)
+      print(head(exp.fcncnts.deseq2))
     }
     else{
-      exp.fcncnts.deseq2  <- read.table(file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"), header = T, sep = "\t", row.names = 1)
-    }
+      deseq2.res.df  <- read.table(file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"), header = T, sep = " ", row.names = 1) #works with gage
+      exp.fcncnts.deseq2 <- deseq2.res.df  $log2FoldChange
+      names( exp.fcncnts.deseq2) <-  rownames(deseq2.res.df )
+     
+      }
     if(!file.exists(paste0(edger.dir, "Volcano_edgeR.tiff"))){
       print("STEP 5b ; running differential analysis using edgeR")
       exp.fcncnts.edger <- run_edgeR(cnts,grp.idx, edger.dir)
     } else{
-      exp.fcncnts.deseq2  <- read.table(file.path(edger.dir, "edgeR_logfoldchange.txt"), header = T, sep = "\t", row.names = 1)
+      edger.res.df  <- read.table(file.path(edger.dir, "edgeR_logfoldchange.txt"), header = T, sep = "\t", row.names = 1) #works with gage
+      exp.fcncnts.deseq2 <-edger.res.df  $log2FC
+      names( exp.fcncnts.deseq2) <-  rownames(edger.res.df )
     }
     
     setwd(gage.dir)
     #chosing to use deseq2 result or edger result for gage
-    if(diff.tool == "DESeq2"){
+    if(diff.tool == "DESeq223"){
       exp.fc <- exp.fcncnts.deseq2
     } else{
       exp.fc <- exp.fcncnts.edger
