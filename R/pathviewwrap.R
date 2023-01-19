@@ -120,7 +120,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     
     setwd(gage.dir)
     #chosing to use deseq2 result or edger result for gage
-    if(diff.tool == "DESeq223"){
+    if(diff.tool == "DESeq2"){
       exp.fc <- exp.fcncnts.deseq2
     } else{
       exp.fc <- exp.fcncnts.edger
