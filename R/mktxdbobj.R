@@ -31,6 +31,6 @@ if (class(txdb)==  "TxDb"){
                           dataSource = "Ensembl",
                           organism = entity)
 }
-AnnotationDbi::saveDb(txdb, file= paste0(outdir, gsub(" ", "", entity), "_txdbobj")) ##why is this not saved
+AnnotationDbi::saveDb(txdb, file= paste0(outdir,"/", gsub(" ", "", entity), "_txdbobj")) ##why is this not saved
 return(txdb)
 }

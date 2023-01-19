@@ -22,7 +22,7 @@
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
                          corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
   
-
+    setwd(outdir)
     dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun)
     
     coldata <- as.data.frame(dirlist[9:10])
@@ -30,6 +30,8 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
 
     dirlist <- unlist(dirlist)
     qc.dir <- dirlist[1]
+    print(qc.dir)
+    print("this is qc dir")
     trim.dir <- dirlist[2]
     sampleFile <- dirlist[3]
     genomeFile <- dirlist[4]
@@ -40,6 +42,8 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
    
     if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
       print("STEP 1 ; running fastqc")
+      print("this is qc.dir")
+      print(qc.dir)
       run_qc(fq.dir, qc.dir, corenum)
     }
 
@@ -57,13 +61,20 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       print("STEP 2; making txdb obj")
       txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity, outdir)
     } else{
-      txdb <- AnnotationDbi::loadDb(paste0(outdir, gsub(" ", "", entity), "_txdbobj"))
+      txdb <- AnnotationDbi::loadDb(paste0(outdir,"/", gsub(" ", "", entity), "_txdbobj"))
     }
     
-    if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { 
+    if(!file.exists(file.path(aligned_bam , "alltrimmedalignedobj.RDS"))){
       setwd(outdir)#make sure you delete this file before rerunning can be better
       print("STEP 3 : aligning the sequence")
       aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir) #can be better?? 
+    }
+    else{
+      aligned_proj <- readRDS(file.path(aligned_bam , "alltrimmedalignedobj.RDS"))
+    }
+    
+     if(!file.exists(file.path(outdir, "combinedcount.trimmed.RDS")  ))  { 
+    
       # why is this not recognizing alignemtn already present
       print("STEP 4: counting aligned sequences")
       returnlistcntsindx <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb, entity, coldata)
