@@ -104,7 +104,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       print(head(exp.fcncnts.deseq2))
     }
     else{
-      deseq2.res.df  <- read.table(file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"), header = T, sep = " ", row.names = 1) #works with gage
+      deseq2.res.df  <- read.table(file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"), header = T, sep = "\t", row.names = 1) #works with gage
       exp.fcncnts.deseq2 <- deseq2.res.df  $log2FoldChange
       names( exp.fcncnts.deseq2) <-  rownames(deseq2.res.df )
      

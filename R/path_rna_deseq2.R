@@ -19,11 +19,9 @@ run_deseq2 <- function(cnts,grp.idx, deseq2.dir){
   names(deseq2.fc)=rownames(deseq2.res)
   exp.fc<- deseq2.fc
   table(is.na(deseq2.res$padj))
-  write.table(deseq2.res , file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"),sep = " " ,col.names =NA, row.names =TRUE, quote =FALSE)
+  write.table(deseq2.res , file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"),sep = "\t" ,col.names =NA, row.names =TRUE, quote =FALSE)
   tiff(file.path(deseq2.dir, "Volcano_deseq2.tiff"), units="in", width=15, height=15, res=300)
   plot(EnhancedVolcano::EnhancedVolcano(deseq2.res, x ='log2FoldChange', y ='pvalue', lab =rownames(deseq2.res)))
   dev.off()
-  print("this is the dataframe returned")
-  print(exp.fc)
   return( exp.fc)
 }
