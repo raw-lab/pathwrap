@@ -21,7 +21,7 @@ run_qCount <- function(genomeFile, geneAnnotation, aligned_proj,corenum, result.
   library(parallel)
   cl2 <- makeCluster(corenum)
   geneLevels <- QuasR::qCount(aligned_proj, txdb, reportLevel ="gene", clObj=cl2)
-  #saveRDS(geneLevels, file.path(result.dir, "combinedcount.trimmed.RDS"))
+  saveRDS(geneLevels, file.path(result.dir, "combinedcount.trimmed.RDS"))
   
   library(DESeq2)
   library(edgeR)

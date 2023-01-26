@@ -37,9 +37,6 @@ run_qAlign <- function(corenum, endness, sampleFile, genomeFile,geneAnnotation, 
     print("We made tmp file, and made index and one alignment")
       }
 }
-
-
-
   cl2 <- makeCluster(corenum)
   print("Alignment is running")
   if (endness=="PE"){
