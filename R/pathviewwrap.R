@@ -57,7 +57,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     stopCluster(cl)
     
     #make txdb from annotation
-    if(!file.exists(paste0(outdir, gsub(" ", "", entity), "_txdbobj"))){
+    if(!file.exists(paste0(outdir,"/", gsub(" ", "", entity), "_txdbobj"))){
       print("STEP 2; making txdb obj")
       txdb <- make_txdbobj(geneAnnotation, corenum, genomeFile, entity, outdir)
     } else{
