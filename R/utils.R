@@ -17,8 +17,8 @@
 sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun){
 
   library(stringr)
-  library(parallel)
-  library(pathview)
+  #library(parallel)
+  #library(pathview)
   #Check if files/folders  exists and create if not
   #################################################################
   if (file.exists(outdir) & rerun == T){
@@ -86,7 +86,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
    # pinfo_string <- "_1.fastq"
     pinfo_string <- "_1.fastq.gz"
   }
-  library(stringr)
+  
   FileName <- grep(pinfo_string,list.files(fq.dir, full.names=T) ,value =T)
   FileName <- str_replace_all(file.path(trim.dir,  basename(FileName)),pinfo_string, paste0("_paired", pinfo_string))
   sampleFile <- file.path(result.dir, "sampleFile.txt")

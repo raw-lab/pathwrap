@@ -23,6 +23,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
                          corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
   
     setwd(outdir)
+    #on.exit(detach("All attached packages, data, connection"), unload = T) #detach = T
     dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun)
     
     coldata <- as.data.frame(dirlist[9:10])
@@ -47,14 +48,17 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       run_qc(fq.dir, qc.dir, corenum)
     }
 
-   
+   library(parallel)
     print("calling fastp")
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
     clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
     ans <- parSapply(cl , read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
     print("the trim run is complete")
+    on.exit(closeAllConnections())
     stopCluster(cl)
+    
+    
     
     #make txdb from annotation
     if(!file.exists(paste0(outdir,"/", gsub(" ", "", entity), "_txdbobj"))){
