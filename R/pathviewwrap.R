@@ -1,5 +1,3 @@
-
-
 #' Title
 #'
 #' @param fq.dir : path of folder where raw fastq files are : one fasta per sample
