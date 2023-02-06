@@ -31,6 +31,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   }
   result.dir <- outdir
   print(paste0("The results will be organized in ",result.dir))
+  setwd(outdir)
 
   # make sure the second column is class and first column is sample name
   # make sure file is tab seperated
