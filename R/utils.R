@@ -115,7 +115,20 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
 
     ###make sure both annot and genome package is installed for the species
     # (set of genome and annotation pkg come from developers list)
-    #annotation pkg installation
+    #delete any annotation files created by Rhisat2 so that annotation pkg can be loaded well.
+   #
+    if(file.exists(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.md5" ) ))){
+      unlink(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.md5" ) ))
+    }
+    if(file.exists(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt.md5" ) ))){
+      unlink(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt.md5" ) ))
+    }
+    if(file.exists(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt" ) ))){
+      unlink(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt" ) ))
+    }
+    
+    
+    #annotation pkg installation 
     pkg.on = require(annotate_pkg, character.only = TRUE, lib.loc = .libPaths()[1])
     if (!pkg.on) {
       if (!requireNamespace("BiocManager", quietly=TRUE))

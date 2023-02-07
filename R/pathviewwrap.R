@@ -21,7 +21,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
                          corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
   
     
-    #on.exit(detach("All attached packages, data, connection"), unload = T) #detach = T
+    #on.exit(detach("All attached packages, data, connection"), unload = T) #detach = T #on exit, clean TxDb package 
     dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun)
     
     coldata <- as.data.frame(dirlist[9:10])

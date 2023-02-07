@@ -10,6 +10,7 @@
 #'
 #' @examples
 run_qc <- function(fq.dir, qc.dir, corenum){
+  on.exit(closeAllConnections())
 library(fastqcr)
 library(ggplot2)
 #install fastqc if system( "which fastqc", intern = T) fails
