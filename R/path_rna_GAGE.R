@@ -22,9 +22,7 @@ run_pathway <- function(entity, exp.fc, compare, gage.dir, cnts, grp.idx){
   kegg.gs<- kegg.gsets(entity)
   run_gset_analysis <- function(gsets, work.dir, same.dir , compare=compare){
     setwd(work.dir)
-    print(paste0("working in " ,   work.dir))
     fc.kegg.p <- gage(exp.fc, gsets = gsets, ref = NULL, samp = NULL, same.dir = same.dir, compare = compare)
-    
     sel <- fc.kegg.p$greater[, "q.val"] < 0.1 & !is.na(fc.kegg.p$greater[, "q.val"])
     path.ids <- rownames(fc.kegg.p$greater)[sel]
     anla_type <- "KEGG"
