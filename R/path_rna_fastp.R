@@ -15,8 +15,8 @@ run_fastp <-function(samplename){
 
       cmd <- paste0("fastp -i " ,file.path(fq.dir , "samplename_to_sed_1.fastq.gz") ,
                     " -I ", file.path(fq.dir , "samplename_to_sed_2.fastq.gz"),
-                    " -o ", file.path(trim.dir , "samplename_to_sed_paired_1.fastq.gz"),
-                    " -O ", file.path(trim.dir , "samplename_to_sed_paired_2.fastq.gz"),
+                    " -o ", file.path(trim.dir , "samplename_to_sed_trimmed_1.fastq.gz"),
+                    " -O ", file.path(trim.dir , "samplename_to_sed_trimmed_2.fastq.gz"),
                     "--adapter_fasta", "data/adapters.fna",
                     " -h " , file.path(trim.dir, "samplename_to_sed.html") ,
                     " -j " , file.path(trim.dir,  "samplename_to_sed.json"))
@@ -24,7 +24,7 @@ run_fastp <-function(samplename){
     } else {
       cmd <- paste0("fastp -i ",
                     file.path(fq.dir , "samplename_to_sed.fastq.gz"),
-                    " -o ",  file.path(trim.dir , "samplename_to_sed_paired.fastq.gz"),
+                    " -o ",  file.path(trim.dir , "samplename_to_sed_trimmed.fastq.gz"),
                     " --adapter_fasta ", "data/adapters.fna", " -h " ,
                     file.path(trim.dir,  "samplename_to_sed.html"),
                     " -j " , file.path( "samplename_to_sed.json"))
@@ -39,8 +39,8 @@ run_fastp <-function(samplename){
       cmd <- paste0("fastp -i " ,
                     file.path(fq.dir , "samplename_to_sed_1.fastq.gz") , " -I ",
                     file.path(fq.dir , "samplename_to_sed_2.fastq.gz"), " -o ",
-                    file.path(trim.dir , "samplename_to_sed_paired_1.fastq.gz"), " -O ",
-                    file.path(trim.dir , "samplename_to_sed_paired_2.fastq.gz"),   " -h " ,
+                    file.path(trim.dir , "samplename_to_sed_trimmed_1.fastq.gz"), " -O ",
+                    file.path(trim.dir , "samplename_to_sed_trimmed_2.fastq.gz"),   " -h " ,
                     file.path(trim.dir, "samplename_to_sed.html") , " -j " ,
                     file.path(trim.dir ,  "samplename_to_sed.json"))
 
@@ -48,7 +48,7 @@ run_fastp <-function(samplename){
       print("fastp running for single end illumina running")
       cmd <- paste0("fastp -i ",
                     file.path(fq.dir , "samplename_to_sed.fastq.gz"), " -o ",
-                    file.path(trim.dir , "samplename_to_sed_paired.fastq.gz"), " -h " ,
+                    file.path(trim.dir , "samplename_to_sed_trimmed.fastq.gz"), " -h " ,
                     file.path(trim.dir,  "samplename_to_sed.html"),  " -j " ,
                     file.path(trim.dir , "samplename_to_sed.json"))
 

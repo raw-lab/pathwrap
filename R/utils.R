@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples
-sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun){
+sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun, filenamepattern){
 
   library(stringr)
   #library(parallel)
@@ -79,28 +79,45 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
 
   ### To run qAlign we need samplefile
   ##############################################################################
-
-  if( endness== "SE"){
-    #pinfo_string <- ".fastq"
-    pinfo_string <- ".fastq.gz"
-  }else{
-   # pinfo_string <- "_1.fastq"
-    pinfo_string <- "_1.fastq.gz"
-  }
+# 
+#   if( endness== "SE"){
+#     #pinfo_string <- ".fastq"
+#     pinfo_string <- ".fastq.gz"
+#   }else{
+#    # pinfo_string <- "_1.fastq"
+#     pinfo_string <- "_1.fastq.gz"
+#   }
+#   
+#   FileName <- grep(pinfo_string,list.files(fq.dir, full.names=T) ,value =T)
+#   FileName <- str_replace_all(file.path(trim.dir,  basename(FileName)),pinfo_string, paste0("_paired", pinfo_string))
+#   sampleFile <- file.path(result.dir, "sampleFile.txt")
+#   SampleName <-  str_remove_all(basename(FileName), paste0("_paired",pinfo_string))
+#   if(endness == "SE") {
+#     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName, SampleName)) ,quote =F ,  col.names=T, row.names=F)
+#   } else{
+#     FileName1 <- FileName
+#     FileName2 <- str_replace_all(FileName1, "_1.fastq.gz", "_2.fastq.gz")
+#     sampleFile <- file.path(result.dir, "sampleFile.txt")
+#     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName1, FileName2, SampleName)) ,quote =F ,  col.names=T, row.names=F)
+#   }
+  #filenamepattern <- ".fastq.gz"
+  pattern1 <- filenamepattern
+  pattern2 <- stringr::str_replace_all(filenamepattern, "1", "2")
   
-  FileName <- grep(pinfo_string,list.files(fq.dir, full.names=T) ,value =T)
-  FileName <- str_replace_all(file.path(trim.dir,  basename(FileName)),pinfo_string, paste0("_paired", pinfo_string))
+  rawfileName <- grep(filenamepattern,list.files(fq.dir, full.names=T) ,value =T)
+  FileName1<- stringr::str_replace_all(file.path(trim.dir,  basename(rawfileName)),pattern1, paste0("_trimmed", pattern1))
+  FileName2 <- stringr::str_replace_all(file.path(trim.dir,  basename(rawfileName)),pattern1, paste0("_trimmed", pattern2))
+  
   sampleFile <- file.path(result.dir, "sampleFile.txt")
-  SampleName <-  str_remove_all(basename(FileName), paste0("_paired",pinfo_string))
+  SampleName <-  stringr::str_remove_all(basename(rawfileName),filenamepattern)
   if(endness == "SE") {
+    FileName <- FileName1
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName, SampleName)) ,quote =F ,  col.names=T, row.names=F)
   } else{
-    FileName1 <- FileName
-    FileName2 <- str_replace_all(FileName1, "_1.fastq.gz", "_2.fastq.gz")
-    sampleFile <- file.path(result.dir, "sampleFile.txt")
+    
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName1, FileName2, SampleName)) ,quote =F ,  col.names=T, row.names=F)
   }
-
+  
   #References
   #if only species name is given and both geneAnnotation and genome is NULL
   if( is.na(ref.dir)){

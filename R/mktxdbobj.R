@@ -17,8 +17,9 @@ if (class(txdb)==  "TxDb"){
     newSeqNames <- paste('Chr', seqlevels(txdb), sep = '')
     names(newSeqNames) <- seqlevels(txdb)
     txdb <- renameSeqlevels( txdb, newSeqNames )
-    seqlevels(txdb)
+    #seqlevels(txdb)
   }
+  closeAllConnections()
 }else{
   library(GenomicFeatures)
   library(Rsamtools)

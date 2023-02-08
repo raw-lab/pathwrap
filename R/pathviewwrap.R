@@ -18,14 +18,14 @@
 
 
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
-                         corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE ){
+                         corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE, filenamepattern = ".fastq.gz" ){
   
     
     #on.exit(detach("All attached packages, data, connection"), unload = T) #detach = T #on exit, clean TxDb package 
-    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun)
+    dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun, filenamepattern)
     
     coldata <- as.data.frame(dirlist[9:10])
-    rownames(coldata) <- str_remove(coldata$Sample, pattern=".fastq.gz")
+    rownames(coldata) <- str_remove(coldata$Sample, pattern=filenamepattern)
 
     dirlist <- unlist(dirlist)
     qc.dir <- dirlist[1]
@@ -51,7 +51,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
     clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
-    ans <- parSapply(cl , read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
+    ans <- parSapply(cl , stringr::str_remove(read.csv( sampleFile , header =T, sep ="\t")$SampleName, filenamepattern)  ,run_fastp )
     print("the trim run is complete")
     on.exit(closeAllConnections())
     stopCluster(cl)
@@ -82,8 +82,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       returnlistcntsindx <-run_qCount(genomeFile, geneAnnotation, aligned_proj, corenum, outdir, txdb, entity, coldata)
       cnts <- returnlistcntsindx$cnts
       grp.idx <- returnlistcntsindx$grp.idx
-    }
-    else{
+    } else{
       cnts <- as.data.frame(readRDS(file.path(outdir, "combinedcount.trimmed.RDS") )) #check
       if(  all(rownames(coldata) == colnames(cnts)) ){#if this then proceed
         ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
@@ -104,8 +103,7 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
       print("STEP 5a ; running differential analysis using DESeq2")
       exp.fcncnts.deseq2 <- run_deseq2(cnts,grp.idx, deseq2.dir)
       print(head(exp.fcncnts.deseq2))
-    }
-    else{
+    }    else{
       deseq2.res.df  <- read.table(file.path(deseq2.dir, "DESEQ2_logfoldchange.txt"), header = T, sep = "\t", row.names = 1) #works with gage
       exp.fcncnts.deseq2 <- deseq2.res.df  $log2FoldChange
       names( exp.fcncnts.deseq2) <-  rownames(deseq2.res.df )

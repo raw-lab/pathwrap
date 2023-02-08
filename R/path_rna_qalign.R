@@ -26,8 +26,7 @@ run_qAlign <- function(corenum, endness, sampleFile, genomeFile,geneAnnotation, 
     if(endness == "SE"){
       aligned_proj <-  QuasR::qAlign(sampleFiletmp_name, paired ="no", clObj=cl2, alignmentsDir =aligned_bam ,
                                      genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2" )
-    }
-    else{
+    }else{
       aligned_proj <-  QuasR::qAlign(sampleFiletmp_name, paired ="fr", clObj=cl2, alignmentsDir =aligned_bam ,
                                      genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2" )
     }# this will form the reference index
