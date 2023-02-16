@@ -23,7 +23,7 @@ else{
   fastqc.path <- Sys.which("fastqc")
 }
 
-fastqcr::fastqc(fq.dir, qc.dir, threads =8,fastqc.path =fastqc.path)
+fastqcr::fastqc(fq.dir, qc.dir,fastqc.path =fastqc.path) #what if threads is removed
 
 qc <- qc_aggregate(qc.dir)
 print ("this line is printing, we are making tiff")

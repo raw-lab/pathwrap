@@ -16,11 +16,9 @@
 #'
 #' @examples pathviewwrap(fq.dir = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw", ref.dir = "~/Documents/Research/UNCC/old/Data/Reference/mouse", phenofile = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw/pheno.txt", outdir="~/Documents/Research/UNCC/Research_rotation-II/newtmp/pathviewwrap/results_withoutref", endness = "SE", entity = "Mus musculus", corenum = 8, diff.tool  = "DESEQ2", compare = "unpaired", seq_tech = "Illumina")
 
-
 pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir="results", endness="SE",  entity="Mus musculus", 
                          corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE, filenamepattern = ".fastq.gz" ){
   
-    
     #on.exit(detach("All attached packages, data, connection"), unload = T) #detach = T #on exit, clean TxDb package 
     dirlist <- sanity_check(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , compare, rerun, filenamepattern)
     
@@ -50,8 +48,10 @@ pathviewwrap <- function(fq.dir="mouse_raw", ref.dir = NA, phenofile= NA, outdir
     print("calling fastp")
     cl <- makeCluster(corenum)
     seq_tech = seq_tech
-    clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir"), envir = environment())#.GlobalEnv)
-    ans <- parSapply(cl , stringr::str_remove(read.csv( sampleFile , header =T, sep ="\t")$SampleName, filenamepattern)  ,run_fastp )
+    clusterExport(cl,c("fq.dir","endness","seq_tech", "trim.dir","filenamepattern"), envir = environment())#.GlobalEnv)
+    ans <- parSapply(cl ,read.csv( sampleFile , header =T, sep ="\t")$SampleName  ,run_fastp )
+    #ans <- parSapply(cl , stringr::str_remove(read.csv( sampleFile , header =T, sep ="\t")$SampleName, filenamepattern)  ,run_fastp )
+    
     print("the trim run is complete")
     on.exit(closeAllConnections())
     stopCluster(cl)

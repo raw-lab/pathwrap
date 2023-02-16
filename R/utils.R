@@ -43,6 +43,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
     print("Please make sure class information is in cloumn 2 with colname 'Class' . ")
   }
   coldata$Class <- as.factor(coldata$Class)
+  
   #check and create dir for organizing results
   checkcretdir <- function(parentname, dirname){
     if(!file.exists(file.path(parentname, dirname))) {
@@ -101,7 +102,7 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
 #     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName1, FileName2, SampleName)) ,quote =F ,  col.names=T, row.names=F)
 #   }
   #filenamepattern <- ".fastq.gz"
-  pattern1 <- filenamepattern
+  pattern1 <- filenamepattern #".fastq.gz" | "01.fastq.gz"
   pattern2 <- stringr::str_replace_all(filenamepattern, "1", "2")
   
   rawfileName <- grep(filenamepattern,list.files(fq.dir, full.names=T) ,value =T)
@@ -110,6 +111,8 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   
   sampleFile <- file.path(result.dir, "sampleFile.txt")
   SampleName <-  stringr::str_remove_all(basename(rawfileName),filenamepattern)
+  #SampleName <-  stringr::str_remove_all(basename(rawfileName),filenamepattern)
+  
   if(endness == "SE") {
     FileName <- FileName1
     write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName, SampleName)) ,quote =F ,  col.names=T, row.names=F)
