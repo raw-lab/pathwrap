@@ -54,7 +54,7 @@ run_fastp <-function(samplename){
   }
   cmd <- stringr::str_replace_all(cmd, "samplename_to_sed", samplename)
 
-  if(!file.exists(file.path(trim.dir , stringr::str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename)))){
+  if(!file.exists(file.path(trim.dir , str_replace_all("samplename_to_sed.json", "samplename_to_sed", samplename)))){
     print("STEP 1b : running fastp")
     print(cmd)
         system(cmd)
