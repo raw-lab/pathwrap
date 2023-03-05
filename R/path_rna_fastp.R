@@ -8,6 +8,7 @@
 #'
 #' @examples 
 run_fastp <-function(samplename){
+  library(stringr)
 
   if (seq_tech == "PacBio" | seq_tech == "Nanopore" ){ #use custom adapters
 
