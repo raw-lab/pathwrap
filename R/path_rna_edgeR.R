@@ -1,9 +1,10 @@
-
 #' Title
 #'
 #' @param cnts
 #' @param grp.idx
 #' @param edgeR.dir
+#'
+#' @import edgeR
 #'
 #' @return
 #' @export
@@ -24,6 +25,6 @@ run_edgeR <- function(cnts,grp.idx, edger.dir){
     plot(EnhancedVolcano::EnhancedVolcano(et$table, x ='logFC', y="PValue", lab=rownames(et$table)))
     dev.off()
     return(exp.fc)
-  
+
   ######
 }
