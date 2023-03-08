@@ -9,12 +9,15 @@
 #' @param cnts
 #' @param grp.idx
 #'
+#' @import gage
+#' @import pathview
+#'
 #' @return
 #' @export
 #'
 #' @examples
 run_pathway <- function(entity, exp.fc, compare, gage.dir, cnts, grp.idx){
- 
+ library(pathview)
   library(gage)
   ref <- which(grp.idx == "reference")
   samp <- which(grp.idx == "sample")
@@ -57,14 +60,13 @@ run_pathway <- function(entity, exp.fc, compare, gage.dir, cnts, grp.idx){
 
   keggcode_sel <- unname(korg[which(korg[,4]==entity),3])
   common_name_species <- bods[,2][which(bods[,3]==keggcode_sel)]
-  
+
   go.gs <- go.gsets(common_name_species)
   go.bp<- go.gs$go.sets[go.gs$go.subs$BP]
   go.mf<-go.gs$go.sets[go.gs$go.subs$MF]
   go.cc<- go.gs$go.sets[go.gs$go.subs$CC]
-  
+
   run_gset_analysis(go.bp,biological_process,same.dir = T, compare=compare )
   run_gset_analysis(go.mf,molecular_function, same.dir = T, compare=compare)
   run_gset_analysis(go.cc, cellular_component, same.dir = T, compare=compare)
 }
-
