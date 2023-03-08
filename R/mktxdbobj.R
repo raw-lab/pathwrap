@@ -4,8 +4,13 @@
 #' @param corenum
 #' @param genomeFile
 #' @param entity
+#' @param outdir
+#'
+#' @import GenomicFeatures
+#' @import Rsamtools
 #'
 #' @return
+#'
 #' @export
 #'
 #' @examples
@@ -23,6 +28,7 @@ if (class(txdb)==  "TxDb"){
 }else{
   library(GenomicFeatures)
   library(Rsamtools)
+  print(genomeFile)
   chrLen <- Rsamtools::scanFaIndex(genomeFile)
   chrominfo <- data.frame(chrom = as.character(seqnames(chrLen)),
                           length = width(chrLen),
