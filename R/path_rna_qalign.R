@@ -11,6 +11,8 @@
 #' @param geneAnnotation
 #' @param ref.dir
 #'
+#' @importFrom QuasR qAlign
+#'
 #' @return
 #' @export
 #'
