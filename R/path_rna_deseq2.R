@@ -4,6 +4,9 @@
 #' @param grp.idx
 #' @param deseq2.dir
 #'
+#' import EnhancedVolcano EnhancedVolcano
+#' @import DESeq2
+#'
 #' @return
 #' @export
 #'
