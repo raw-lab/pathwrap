@@ -1,9 +1,11 @@
-
 #' Title
 #'
 #' @param fq.dir
 #' @param qc.dir
 #' @param corenum
+#'
+#' @import ggplot2
+#' @import fastqcr
 #'
 #' @return
 #' @export
@@ -41,4 +43,3 @@ plot(ggplot(qc, aes(x=sample, y =status)) + geom_tile())
 dev.off()
 print("Multiqc report done")
 }
-
