@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-run_qCount <- function(genomeFile, geneAnnotation, aligned_proj,corenum, result.dir, txdb, entity, coldata){
+run_qCount <- function(genomeFile, geneAnnotation, aligned_proj,corenum, result.dir, txdb, entity){
   ##
   #for mapping
   library(Rsamtools) #scanFaIndex
@@ -35,22 +35,6 @@ run_qCount <- function(genomeFile, geneAnnotation, aligned_proj,corenum, result.
     rownames(cnts)<- str_remove(rownames(cnts),"\\.[0-9]+$" )
     cnts<- mol.sum(cnts, id.map = "ENSEMBL", gene.annotpkg =bods[ which(bods[,3]==orgcode)]) #converting to entrez # what if gene id is not ensembl and what if arabidopsis thaliana id.map might be ath or else thing
   }
-  
-  cnts <- cnts[, rownames(coldata)]
   saveRDS(cnts, file.path(result.dir, "combinedcount.trimmed.RDS"))
-  
-  if(  all(rownames(coldata) == colnames(cnts)) ){#if this then proceed
-    ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
-    samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
-    grp.idx <-NULL
-    grp.idx[ref] <- "reference"
-    grp.idx[samp] <- "sample"
-  }
-  else{
-    message("make sure pheno file have only samples analysed")
-  }
-  #print("this is the counts data")
- #print( head(cnts))
-  countreturnlist <- list("cnts" = cnts , "grp.idx"= grp.idx)
-  return(countreturnlist )
+  return(cnts )
 }
