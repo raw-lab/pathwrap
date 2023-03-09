@@ -12,7 +12,7 @@ run_fastp <-function(sampleName){
   trimmedoutfile <-  FileName[intformatch,] #trimmedoutfile$FileName1 , trimmedoutfile$Filename2
   infile <- filenames[intformatch,]  #infile$FileName1 , infile$FileName2 #infile for SE
   if (endness=="PE"){
-    infileoutfile <- paste0("-i ", infile$FileName1 ,   " -I ", infile$FileName2,   " -o ", trimmedoutfile["FileName1"],  " -O ", trimmedoutfile["FileName1"])
+    infileoutfile <- paste0("-i ", infile$FileName1 ,   " -I ", infile$FileName2,   " -o ", trimmedoutfile["FileName1"],  " -O ", trimmedoutfile["FileName2"])
   } else {
     infileoutfile <- paste0("-i ", infile, " -o ", trimmedoutfile)
   }
