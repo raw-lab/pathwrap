@@ -1,7 +1,7 @@
 #############################################################################
 #2. RUN THE ANALYSIS # Alignmnet and counting
 #############################################################################
-library(QuasR)
+
 #' Title
 #'
 #' @param corenum
@@ -10,6 +10,8 @@ library(QuasR)
 #' @param genomeFile
 #' @param geneAnnotation
 #' @param ref.dir
+#'
+#' @importFrom QuasR qAlign
 #'
 #' @return
 #' @export
@@ -26,8 +28,7 @@ run_qAlign <- function(corenum, endness, sampleFile, genomeFile,geneAnnotation, 
     if(endness == "SE"){
       aligned_proj <-  QuasR::qAlign(sampleFiletmp_name, paired ="no", clObj=cl2, alignmentsDir =aligned_bam ,
                                      genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2" )
-    }
-    else{
+    }else{
       aligned_proj <-  QuasR::qAlign(sampleFiletmp_name, paired ="fr", clObj=cl2, alignmentsDir =aligned_bam ,
                                      genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2" )
     }# this will form the reference index
@@ -37,9 +38,6 @@ run_qAlign <- function(corenum, endness, sampleFile, genomeFile,geneAnnotation, 
     print("We made tmp file, and made index and one alignment")
       }
 }
-
-
-
   cl2 <- makeCluster(corenum)
   print("Alignment is running")
   if (endness=="PE"){

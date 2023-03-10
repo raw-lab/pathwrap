@@ -1,61 +1,37 @@
 #run fastp
-#' Title
+#' to run trimming
 #'
-#' @param samplename
+#' @param sampleName
 #'
 #' @return
 #' @export
 #'
 #' @examples
-run_fastp <-function(samplename){
-
-  if (seq_tech == "PacBio" | seq_tech == "Nanopore" ){ #use custom adapters
-
-    if (endness=="PE"){
-
-      cmd <- paste0("fastp -i " ,file.path(fq.dir , "samplename_to_sed_1.fastq") ,
-                    " -I ", file.path(fq.dir , "samplename_to_sed_2.fastq"),
-                    " -o ", file.path(trim.dir , "samplename_to_sed_paired_1.fastq"),
-                    " -O ", file.path(trim.dir , "samplename_to_sed_paired_2.fastq"),
-                    "--adapter_fasta", "data/adapters.fna",
-                    " -h " , file.path(trim.dir, "samplename_to_sed.html") ,
-                    " -j " , file.path(trim.dir,  "samplename_to_sed.json"))
-
-    } else {
-      cmd <- paste0("fastp -i ",
-                    file.path(fq.dir , "samplename_to_sed.fastq"),
-                    " -o ",  file.path(trim.dir , "samplename_to_sed_paired.fastq"),
-                    " --adapter_fasta ", "data/adapters.fna", " -h " ,
-                    file.path(trim.dir,  "samplename_to_sed.html"),
-                    " -j " , file.path( "samplename_to_sed.json"))
-    }
-
-
-
-
+run_fastp <-function(sampleName){
+  intformatch <- grep(sampleName, FileName[,1], value = F, fixed = T) #integer
+  trimmedoutfile <-  FileName[intformatch,] #trimmedoutfile$FileName1 , trimmedoutfile$Filename2
+  infile <- filenames[intformatch,]  #infile$FileName1 , infile$FileName2 #infile for SE
+  if (endness=="PE"){
+    infileoutfile <- paste0("-i ", infile$FileName1 ,   " -I ", infile$FileName2,   " -o ", trimmedoutfile["FileName1"],  " -O ", trimmedoutfile["FileName2"])
   } else {
-    if (endness=="PE"){
-
-      cmd <- paste0("fastp -i " ,
-                    file.path(fq.dir , "samplename_to_sed_1.fastq") , " -I ",
-                    file.path(fq.dir , "samplename_to_sed_2.fastq"), " -o ",
-                    file.path(trim.dir , "samplename_to_sed_paired_1.fastq"), " -O ",
-                    file.path(trim.dir , "samplename_to_sed_paired_2.fastq"),   " -h " ,
-                    file.path(trim.dir, "samplename_to_sed.html") , " -j " ,
-                    file.path(trim.dir ,  "samplename_to_sed.json"))
-
-    } else {
-      cmd <- paste0("fastp -i ",
-                    file.path(fq.dir , "samplename_to_sed.fastq"), " -o ",
-                    file.path(trim.dir , "samplename_to_sed_paired.fastq"), " -h " ,
-                    file.path(trim.dir,  "samplename_to_sed.html"),  " -j " ,
-                    file.path(trim.dir , "samplename_to_sed.json"))
-
-    }
+    infileoutfile <- paste0("-i ", infile, " -o ", trimmedoutfile)
   }
 
-  cmd <- stringr::str_replace_all(cmd, "samplename_to_sed", samplename)
-  print(cmd)
-  system(cmd)
+ logfile <- paste0( " -h " , file.path(trim.dir, paste0(sampleName, ".html")) ,  " -j " , file.path(trim.dir,  paste0(sampleName, ".json")))
 
-}
+ #actual command
+  if (seq_tech == "PacBio" | seq_tech == "Nanopore" ){ #use custom adapters
+    cmd <- paste0("fastp " , infileoutfile,  "--adapter_fasta", "data/adapters.fna", logfile)
+  } else {
+    cmd <- paste0("fastp " , infileoutfile, logfile)
+  }
+ #file check before running command
+  if (endness=="PE"){
+   checkcondition <- length(list.files(trim.dir, pattern ="json")) <=0 |  (length(list.files(trim.dir, pattern ="trimmed")) != (2*length(list.files(trim.dir, pattern ="json"))))
+  } else { checkcondition <- length(list.files(trim.dir, pattern ="json")) <=0 | (length(list.files(trim.dir, pattern ="trimmed")) != length(list.files(trim.dir, pattern ="json")))}
+  if (checkcondition){
+     print("STEP 1b : running fastp")
+    print(cmd)
+    system(cmd)
+  }
+ }

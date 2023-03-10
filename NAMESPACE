@@ -3,7 +3,6 @@
 export(make_txdbobj)
 export(pathviewwrap)
 export(run_deseq2)
-export(run_difftool)
 export(run_edgeR)
 export(run_fastp)
 export(run_pathway)

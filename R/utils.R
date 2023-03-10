@@ -1,55 +1,32 @@
 #make sure force = T is good
 #' Title
 #'
-#' @param fq.dir
 #' @param ref.dir
-#' @param phenofile
 #' @param outdir
-#' @param endness
 #' @param entity
 #' @param corenum
-#' @param diff.tool
 #' @param compare
+#'
+#' @importFrom stringr str_replace_all
 #'
 #' @return
 #' @export
 #'
 #' @examples
-sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity , corenum , diff.tool, compare){
-
+sanity_check <- function( ref.dir , outdir,  entity , corenum , compare, rerun){
   library(stringr)
-
-  #################################################################
-  ##
-  #Check if files/folders  exists and create if not
-  ##
-  #################################################################
+  if (file.exists(outdir) & rerun == T){
+    unlink(outdir, recursive = T)
+  }
 
   if (!file.exists(outdir)){
     # default output file
     dir.create(outdir)
   }
   result.dir <- outdir
-  #print("The results will be organized in ",result.dir)
+  print(paste0("The results will be organized in ",result.dir))
+  setwd(outdir)
 
-  # make sure the second column is class and first column is sample name
-  # make sure file is tab seperated
-  if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
-    print("Please provide phenofile with Class information")
-  }
-  coldata <- read.table(phenofile, sep = "\t", header = T)
-  if(colnames(coldata)[2]!="Class"){
-    print("Please make sure class information is in cloumn 2 with colname 'Class' . ")
-  }
-  coldata$Class <- as.factor(coldata$Class)
-  ref <- which(coldata[, 2] ==  levels(coldata[, 2])[1])
-  samp <- which(coldata[, 2] ==  levels(coldata[, 2])[2])
-  grp.idx <-NULL
-  grp.idx[ref] <- "reference"
-  grp.idx[samp] <- "sample"
-  ##TO DO write something to automatically determine paired infromation, rev/fr etc
-  print("this is first grp.idx")
-  print(grp.idx)
   #check and create dir for organizing results
   checkcretdir <- function(parentname, dirname){
     if(!file.exists(file.path(parentname, dirname))) {
@@ -79,50 +56,34 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
   trim.log <- fastp_log
   pathway.dir <- pathway_analysis
   edger.dir <- edgeR
+  print(edger.dir)
   deseq2.dir <- DESeq2
   kegg.dir <- KEGG
   go.dir <- GO
 
-
-  ### To run qAlign we need samplefile
-  ## TO DO Make sure this works for all types of file name and single and paired end data, bunch of bam files and bunch of fastq files, partially complete
-  ##############################################################################
-
-  if( endness== "SE"){
-    pinfo_string <- ".fastq"
-  }else{
-    pinfo_string <- "_1.fastq"
-  }
-  library(stringr)
-  FileName <- grep(pinfo_string,list.files(fq.dir, full.names=T) ,value =T)
-  FileName <- str_replace_all(file.path(trim.dir,  basename(FileName)),pinfo_string, paste0("_paired", pinfo_string))
-  sampleFile <- file.path(result.dir, "sampleFile.txt")
-  SampleName <-  str_remove_all(basename(FileName), paste0("_paired",pinfo_string))
-  if(endness == "SE") {
-    write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName, SampleName)) ,quote =F ,  col.names=T, row.names=F)
-  } else{
-    FileName1 <- FileName
-    FileName2 <- str_replace_all(FileName1, "_1.fastq", "_2.fastq")
-    sampleFile <- file.path(result.dir, "sampleFile.txt")
-    write.table(file =sampleFile,sep = "\t", as.data.frame( cbind(FileName1, FileName2, SampleName)) ,quote =F ,  col.names=T, row.names=F)
-  }
-
-
-
   #References
   #if only species name is given and both geneAnnotation and genome is NULL
   if( is.na(ref.dir)){
-    #ref_info <- read.table("data/species_genome_annotation_pkg", sep = "\t", header = T, na.strings=c(""," ","NA")) #this file is supplied with script
-    #ref_info <- as.data.frame(readRDS("data/anntpkglist.RDS"))#, sep = "\t", header = T, na.strings=c(""," ","NA")) #this file is supplied with script
+    data(anntpkglist, package = "pathviewwrap")
     ref_info <- anntpkglist
 
     species_no <- which(ref_info$species==entity)
     annotate_pkg <- ref_info$annotation[species_no]
     genome_pkg <- ref_info$genome[species_no]
-
-    ###make sure both annot and genome package is installed for the species
+    
     # (set of genome and annotation pkg come from developers list)
+    #
+    if(file.exists(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.md5" ) ))){
+      unlink(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.md5" ) ))
+    }
+    if(file.exists(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt.md5" ) ))){
+      unlink(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt.md5" ) ))
+    }
+    if(file.exists(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt" ) ))){
+      unlink(file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite.SpliceSites.txt" ) ))
+    }
 
+    #annotation pkg installation
     pkg.on = require(annotate_pkg, character.only = TRUE, lib.loc = .libPaths()[1])
     if (!pkg.on) {
       if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -133,12 +94,17 @@ sanity_check <- function(fq.dir, ref.dir , phenofile, outdir, endness,  entity ,
         stop(paste("Fail to install/load gene annotation package ",annotate_pkg, "!", sep = ""))
     }
     geneAnnotation <-  file.path(.libPaths()[1],annotate_pkg, "extdata", paste0(annotate_pkg, ".sqlite" ) )
+
+    #genome file installation
     genomeFile <- genome_pkg
+    pkg.on = require(genome_pkg, character.only = TRUE, lib.loc = .libPaths()[1])
+    if (!pkg.on) {
+      BiocManager::install(genome_pkg,force = T, suppressUpdates =TRUE, lib.loc = .libPaths()[1] )
+    }
   } else {
     genomeFile <- list.files(ref.dir, ".fa$", full.names= T)
     geneAnnotation <- list.files(ref.dir, ".gtf$", full.names = T) #could be changed to include one of gtf, gff etc, check with quasR package
 
   }
-  return (c(qc.dir,trim.dir,sampleFile, genomeFile, geneAnnotation, deseq2.dir,gage.dir, grp.idx))
+  return (c(qc.dir,trim.dir, genomeFile, geneAnnotation, deseq2.dir, edger.dir, gage.dir))
 }
-

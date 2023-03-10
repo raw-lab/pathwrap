@@ -4,12 +4,17 @@
 #' @param corenum
 #' @param genomeFile
 #' @param entity
+#' @param outdir
+#'
+#' @import GenomicFeatures
+#' @import Rsamtools
 #'
 #' @return
+#'
 #' @export
 #'
 #' @examples
-make_txdbobj <- function(geneAnnotation, corenum, genomeFile, entity){
+make_txdbobj <- function(geneAnnotation, corenum, genomeFile, entity, outdir){
 txdb <- try(loadDb(geneAnnotation), silent = T)
 cl2 <- makeCluster(corenum)
 if (class(txdb)==  "TxDb"){
@@ -17,12 +22,14 @@ if (class(txdb)==  "TxDb"){
     newSeqNames <- paste('Chr', seqlevels(txdb), sep = '')
     names(newSeqNames) <- seqlevels(txdb)
     txdb <- renameSeqlevels( txdb, newSeqNames )
-    seqlevels(txdb)
+    #seqlevels(txdb)
   }
+  closeAllConnections()
 }else{
   library(GenomicFeatures)
-
-  chrLen <- scanFaIndex(genomeFile)
+  library(Rsamtools)
+  print(genomeFile)
+  chrLen <- Rsamtools::scanFaIndex(genomeFile)
   chrominfo <- data.frame(chrom = as.character(seqnames(chrLen)),
                           length = width(chrLen),
                           is_circular = rep(FALSE, length(chrLen)))
@@ -31,5 +38,6 @@ if (class(txdb)==  "TxDb"){
                           dataSource = "Ensembl",
                           organism = entity)
 }
+AnnotationDbi::saveDb(txdb, file= paste0(outdir,"/", gsub(" ", "", entity), "_txdbobj")) ##why is this not saved
 return(txdb)
 }
