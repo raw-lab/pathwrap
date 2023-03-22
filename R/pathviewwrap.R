@@ -58,7 +58,7 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
     print("STEP 1 ; running fastqc")
     print("this is qc.dir")
     print(qc.dir)
-    #run_qc(fq.dir, qc.dir, corenum)
+    run_qc(fq.dir, qc.dir, corenum)
   }
 
   if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
