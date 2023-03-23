@@ -21,7 +21,7 @@
 #' @examples pathviewwrap(fq.dir = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw", ref.dir = "~/Documents/Research/UNCC/old/Data/Reference/mouse", phenofile = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw/pheno.txt", outdir="~/Documents/Research/UNCC/Research_rotation-II/newtmp/pathviewwrap/results_withoutref", endness = "SE", entity = "Mus musculus", corenum = 8, diff.tool  = "DESEQ2", compare = "unpaired", seq_tech = "Illumina")
 
 pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity="Mus musculus",
-                         corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE, cacheDir = NA ){
+                         corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE, cacheDir = NULL ){
 
 
    dirlist <- sanity_check( ref.dir ,  outdir,  entity , corenum , compare, rerun)
