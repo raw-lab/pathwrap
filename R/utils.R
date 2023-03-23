@@ -102,7 +102,7 @@ sanity_check <- function( ref.dir , outdir,  entity , corenum , compare, rerun){
       BiocManager::install(genome_pkg,force = T, suppressUpdates =TRUE, lib.loc = .libPaths()[1] )
     }
   } else {
-    genomeFile <- list.files(ref.dir, ".fa$", full.names= T)
+    genomeFile <- list.files(ref.dir, ".fna$", full.names= T)
     geneAnnotation <- list.files(ref.dir, ".gtf$", full.names = T) #could be changed to include one of gtf, gff etc, check with quasR package
 
   }
