@@ -26,11 +26,18 @@ run_fastp <-function(sampleName){
     cmd <- paste0("fastp " , infileoutfile, logfile)
   }
  #file check before running command
+  #if (endness=="PE"){
+  # checkcondition <- length(list.files(trim.dir, pattern ="json")) <=0 |  (length(list.files(trim.dir, pattern ="trimmed")) != (2*length(list.files(trim.dir, pattern ="json"))))
+  #} else { checkcondition <- length(list.files(trim.dir, pattern ="json")) <=0 | (length(list.files(trim.dir, pattern ="trimmed")) != length(list.files(trim.dir, pattern ="json")))}
+  #if (checkcondition){
+   #  print("STEP 1b : running fastp")
+   # print(cmd)
+   # system(cmd)
   if (endness=="PE"){
-   checkcondition <- length(list.files(trim.dir, pattern ="json")) <=0 |  (length(list.files(trim.dir, pattern ="trimmed")) != (2*length(list.files(trim.dir, pattern ="json"))))
-  } else { checkcondition <- length(list.files(trim.dir, pattern ="json")) <=0 | (length(list.files(trim.dir, pattern ="trimmed")) != length(list.files(trim.dir, pattern ="json")))}
+    checkcondition <- !file.exists(trimmedoutfile["FileName1"]) &  !file.exists(trimmedoutfile["FileName2"])
+  } else { checkcondition <- !file.exists(trimmedoutfile) }
   if (checkcondition){
-     print("STEP 1b : running fastp")
+    print("STEP 1b : running fastp")
     print(cmd)
     system(cmd)
   }
