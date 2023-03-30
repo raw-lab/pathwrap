@@ -137,7 +137,8 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
 
   if (keep_tmp == FALSE){
     print("deleting aligned bam files, bam file index and log files")
-    unlink(file.path(outdir, "aligned_bam", "*bam*"))
+    #unlink(file.path(outdir, "aligned_bam", "*bam*"))
+    unlink(list.files(file.path(outdir, "aligned_bam"), pattern = ".bam$|.bai$", full.names = T))
   }
 
   if(!file.exists(paste0(deseq2.dir, "/Volcano_deseq2.tiff"))){
