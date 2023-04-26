@@ -28,30 +28,35 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
    qc.dir <- dirlist[1]
    trim.dir <- dirlist[2]
    genomeFile <- dirlist[3]
+   print("this is genome File")
+   print(genomeFile)
    geneAnnotation <- dirlist[4]
+   print("this is geneAnnotation")
+   print(geneAnnotation)
   deseq2.dir <- dirlist[5]
   edger.dir <- dirlist[6]
   gage.dir <- dirlist[7]
 
-  if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
-    print("Please provide phenofile with Class information")
-  }
-  coldata <- read.table(phenofile, sep = "\t", header = T)
-  if(colnames(coldata)[ncol(coldata)]!="Class"){
-    print("Please make sure class information is in last column with colname 'Class' . ")
-  }
-  coldata$Class <- as.factor(coldata$Class)
-  SampleName <- coldata$Sample
-  filenames <- coldata[,-c(1,ncol(coldata))]
+  #duplicated codes
+  # if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
+  #   print("Please provide phenofile with Class information")
+  # }
+  # coldata <- read.table(phenofile, sep = "\t", header = T)
+  # if(colnames(coldata)[ncol(coldata)]!="Class"){
+  #   print("Please make sure class information is in last column with colname 'Class' . ")
+  # }
+  # coldata$Class <- as.factor(coldata$Class)
+  # SampleName <- coldata$Sample
+  # filenames <- coldata[,-c(1,ncol(coldata))]
 
-  if(is.null(dim(filenames))){
-    endness <- "SE"
-    fq.dir <-  dirname(filenames[1])
-  } else if(dim(filenames)[2] == 2){
-    endness <- "PE"
-    fq.dir <- dirname(filenames$FileName1[1])
-
-  }
+  # if(is.null(dim(filenames))){
+  #   endness <- "SE"
+  #   fq.dir <-  dirname(filenames[1])
+  # } else if(dim(filenames)[2] == 2){
+  #   endness <- "PE"
+  #   fq.dir <- dirname(filenames$FileName1[1])
+  # 
+  # }
 
   #run the fastqc
   if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
@@ -122,6 +127,8 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
     } else{
     cnts <- as.data.frame(readRDS(file.path(outdir, "combinedcount.trimmed.RDS") ))
     }
+  print("these are samplename for cnts , cnts[, coldata$SampleName] ")
+  print(coldata$SampleName)
   cnts <- cnts[, coldata$SampleName]
   if(  all(coldata$SampleName == colnames(cnts)) ){#if this then proceed
     ref <- which(coldata$Class ==  levels(coldata$Class)[1])

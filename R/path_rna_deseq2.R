@@ -4,7 +4,7 @@
 #' @param grp.idx
 #' @param deseq2.dir
 #'
-#' import EnhancedVolcano EnhancedVolcano
+#' @import EnhancedVolcano EnhancedVolcano
 #' @import DESeq2
 #'
 #' @return
@@ -12,6 +12,7 @@
 #'
 #' @examples
 run_deseq2 <- function(cnts,grp.idx, deseq2.dir){
+  library(DESeq2)
   coldat=DataFrame(grp=factor(grp.idx))
   dds <- DESeqDataSetFromMatrix(cnts, colData=coldat, design =~ grp)
   dds <- DESeq(dds)

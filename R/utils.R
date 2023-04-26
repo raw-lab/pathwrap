@@ -102,9 +102,19 @@ sanity_check <- function( ref.dir , outdir,  entity , corenum , compare, rerun){
       BiocManager::install(genome_pkg,force = T, suppressUpdates =TRUE, lib.loc = .libPaths()[1] )
     }
   } else {
-    genomeFile <- list.files(ref.dir, ".fa$|.fna$", full.names= T)
+    genomeFile <- list.files(ref.dir, ".fa$|.fna$|.fa.gz", full.names= T)[1]
+    #unzipping .gz file because both scanFaIndex and qAlign do not work with gzip' ed file, require bgzip file
+    library(Rsamtools)
+    if(summary( file(genomeFile) )$class ==  "gzfile"){
+      system(paste0('gunzip -k ' , genomeFile ))
+      genomeFile <- str_remove(pattern = ".gz$", genomeFile)
+    }
     geneAnnotation <- list.files(ref.dir, ".gtf$|.gff$", full.names = T) #could be changed to include one of gtf, gff etc, check with quasR package
+    print(geneAnnotation)
 
   }
+  print("this is utils File, qc.dir,trim.dir, genomeFile, geneAnnotation, deseq2.dir, edger.dir, gage.dir")
+  print(paste0(qc.dir,trim.dir, genomeFile, geneAnnotation, deseq2.dir, edger.dir, gage.dir))
+  
   return (c(qc.dir,trim.dir, genomeFile, geneAnnotation, deseq2.dir, edger.dir, gage.dir))
 }
