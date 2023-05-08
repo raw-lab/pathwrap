@@ -27,10 +27,10 @@ run_qAlign <- function(corenum, endness, sampleFile, genomeFile,geneAnnotation, 
     cl2 <- makeCluster(corenum)
     if(endness == "SE"){
       aligned_proj <-  QuasR::qAlign(sampleFiletmp_name, paired ="no", clObj=cl2, alignmentsDir =aligned_bam ,
-                                     genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rbowtie",cacheDir= cacheDir)
+                                     genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2",cacheDir= cacheDir)
     }else{
       aligned_proj <-  QuasR::qAlign(sampleFiletmp_name, paired ="fr", clObj=cl2, alignmentsDir =aligned_bam ,
-                                     genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rbowtie" ,cacheDir=cacheDir)
+                                     genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2" ,cacheDir=cacheDir)
     }# this will form the reference index
 
     #the program check for aligned bam before running so we dont really need to remove this sample from our sampleFile
@@ -41,10 +41,10 @@ run_qAlign <- function(corenum, endness, sampleFile, genomeFile,geneAnnotation, 
   cl2 <- makeCluster(corenum)
   print("Alignment is running")
   if (endness=="PE"){
-    aligned_proj <- QuasR::qAlign(sampleFile,paired ="fr", clObj=cl2, alignmentsDir =aligned_bam , genome=genomeFile, geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rbowtie" ,cacheDir=cacheDir)
+    aligned_proj <- QuasR::qAlign(sampleFile,paired ="fr", clObj=cl2, alignmentsDir =aligned_bam , genome=genomeFile, geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2" ,cacheDir=cacheDir)
   } else {
 
-    aligned_proj <- QuasR::qAlign(sampleFile,paired ="no", clObj=cl2, alignmentsDir =aligned_bam ,  genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rbowtie",cacheDir =cacheDir)
+    aligned_proj <- QuasR::qAlign(sampleFile,paired ="no", clObj=cl2, alignmentsDir =aligned_bam ,  genome=genomeFile,geneAnnotation=geneAnnotation, splicedAlignment =TRUE, aligner ="Rhisat2",cacheDir =cacheDir)
   print("done")
     }
   saveRDS(aligned_proj, file.path(aligned_bam , "alltrimmedalignedobj.RDS"))
