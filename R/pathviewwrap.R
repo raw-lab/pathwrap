@@ -60,12 +60,7 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
   # }
 
   #run the fastqc
-  if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
-    print("STEP 1 ; running fastqc")
-    print("this is qc.dir")
-    print(qc.dir)
-    run_qc(fq.dir, qc.dir, corenum)
-  }
+ 
 
   if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
     print("Please provide phenofile with Class information")
@@ -84,6 +79,13 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
   } else if(dim(filenames)[2] == 2){
     endness <- "PE"
     fq.dir <- dirname(filenames$FileName1[1])
+  }
+  
+  if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
+    print("STEP 1 ; running fastqc")
+    print("this is qc.dir")
+    print(qc.dir)
+    run_qc(fq.dir, qc.dir, corenum)
   }
 
   sampleFile <- file.path(outdir, "sampleFile.txt")
