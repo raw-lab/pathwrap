@@ -10,6 +10,7 @@
 #' @param diff.tool :  what differential tool to to use, “DESEQ2” or “edgeR” available
 #' @param compare : what is sample/experimental design you have, paired or unpaired, as.group
 #' @param seq_tech : Illumina, pacbio or nanopore
+#' @param aligner : One of "Rhisat2" or "Rbowtie2"; Rbowtie2 can be very slow for human and eukaryotic species
 #'
 #' @importFrom stringr str_replace_all
 #' @import parallel
@@ -21,7 +22,7 @@
 #' @examples pathviewwrap(fq.dir = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw", ref.dir = "~/Documents/Research/UNCC/old/Data/Reference/mouse", phenofile = "~/Documents/Research/UNCC/old/mouse/fresh/mouse_raw/pheno.txt", outdir="~/Documents/Research/UNCC/Research_rotation-II/newtmp/pathviewwrap/results_withoutref", endness = "SE", entity = "Mus musculus", corenum = 8, diff.tool  = "DESEQ2", compare = "unpaired", seq_tech = "Illumina")
 
 pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity="Mus musculus",
-                         corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE, cacheDir = NULL ){
+                         corenum = 8,  compare="unpaired",diff.tool = "DESeq2", seq_tech="Illumina", keep_tmp = FALSE,rerun = FALSE, cacheDir = NULL , aligner){
 
 
    dirlist <- sanity_check( ref.dir ,  outdir,  entity , corenum , compare, rerun)
@@ -96,6 +97,10 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
   } else{
     write.table(file=sampleFile,sep = "\t", as.data.frame( cbind(FileName[,1], FileName[,2], SampleName)), col.names = c("FileName1","FileName2", "SampleName"), quote =F ,  row.names=F)
   }
+  
+  #just in case there is random component in run_fastp
+  RNGkind("L'Ecuyer-CMRG")
+  set.seed(1)
 
   library(parallel)
   cl <- makeCluster(corenum)
@@ -103,6 +108,9 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
   parSapply(cl , SampleName  ,run_fastp )
   print("the trim run is complete")
   stopCluster(cl)
+  
+  #to check if all the nodes run fine
+ # bad <- sapply(r, inherits, what = "try-error") # r<- mclappy()
 
   #make txdb from annotation
   if(!file.exists(paste0(outdir,"/", gsub(" ", "", entity), "_txdbobj"))){
@@ -115,7 +123,7 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
   if(!file.exists(file.path(aligned_bam , "alltrimmedalignedobj.RDS"))){
     setwd(outdir)#make sure you delete this file before rerunning can be better
     print("STEP 3 : aligning the sequence")
-    aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir, cacheDir) #can be better??
+    aligned_proj <- run_qAlign(corenum, endness, sampleFile, genomeFile,geneAnnotation, ref.dir, cacheDir,aligner) #can be better??
   }
   else{
     aligned_proj <- readRDS(file.path(aligned_bam , "alltrimmedalignedobj.RDS"))
@@ -127,8 +135,8 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
     } else{
     cnts <- as.data.frame(readRDS(file.path(outdir, "combinedcount.trimmed.RDS") ))
     }
-  print("these are samplename for cnts , cnts[, coldata$SampleName] ")
-  print(coldata$SampleName)
+  #print("these are samplename for cnts , cnts[, coldata$SampleName] ")
+  #print(coldata$SampleName)
   cnts <- cnts[, coldata$SampleName]
   if(  all(coldata$SampleName == colnames(cnts)) ){#if this then proceed
     ref <- which(coldata$Class ==  levels(coldata$Class)[1])
