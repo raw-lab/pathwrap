@@ -37,26 +37,26 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
   edger.dir <- dirlist[6]
   gage.dir <- dirlist[7]
 
-  #duplicated codes
-  # if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
-  #   print("Please provide phenofile with Class information")
-  # }
-  # coldata <- read.table(phenofile, sep = "\t", header = T)
-  # if(colnames(coldata)[ncol(coldata)]!="Class"){
-  #   print("Please make sure class information is in last column with colname 'Class' . ")
-  # }
-  # coldata$Class <- as.factor(coldata$Class)
-  # SampleName <- coldata$Sample
-  # filenames <- coldata[,-c(1,ncol(coldata))]
+  
+   if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
+     print("Please provide phenofile with Class information")
+   }
+   coldata <- read.table(phenofile, sep = "\t", header = T)
+   if(colnames(coldata)[ncol(coldata)]!="Class"){
+     print("Please make sure class information is in last column with colname 'Class' . ")
+   }
+   coldata$Class <- as.factor(coldata$Class)
+   SampleName <- coldata$Sample
+   filenames <- coldata[,-c(1,ncol(coldata))]
 
-  # if(is.null(dim(filenames))){
-  #   endness <- "SE"
-  #   fq.dir <-  dirname(filenames[1])
-  # } else if(dim(filenames)[2] == 2){
-  #   endness <- "PE"
-  #   fq.dir <- dirname(filenames$FileName1[1])
-  # 
-  # }
+   if(is.null(dim(filenames))){
+     endness <- "SE"
+     fq.dir <-  dirname(filenames[1])
+   } else if(dim(filenames)[2] == 2){
+     endness <- "PE"
+     fq.dir <- dirname(filenames$FileName1[1])
+   
+   }
 
   #run the fastqc
   if (!file.exists(file.path(qc.dir,"qc_heatmap.tiff"))){
@@ -66,24 +66,24 @@ pathviewwrap <- function( ref.dir = NA, phenofile= NA, outdir="results",  entity
     run_qc(fq.dir, qc.dir, corenum)
   }
 
-  if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
-    print("Please provide phenofile with Class information")
-  }
-  coldata <- read.table(phenofile, sep = "\t", header = T)
-  if(colnames(coldata)[ncol(coldata)]!="Class"){
-    print("Please make sure class information is in last column with colname 'Class' . ")
-  }
-  coldata$Class <- as.factor(coldata$Class)
-  SampleName <- coldata$Sample
-  filenames <- as.data.frame(coldata[,-c(1,ncol(coldata))])
+  #if (!file.exists(phenofile)){ ###TO DO make sure reference is first aplhanumerically#
+  #  print("Please provide phenofile with Class information")
+  #}
+  #coldata <- read.table(phenofile, sep = "\t", header = T)
+  #if(colnames(coldata)[ncol(coldata)]!="Class"){
+  #  print("Please make sure class information is in last column with colname 'Class' . ")
+  #}
+  #coldata$Class <- as.factor(coldata$Class)
+  #SampleName <- coldata$Sample
+  #filenames <- as.data.frame(coldata[,-c(1,ncol(coldata))])
 
-  if(dim(filenames)[2] == 1){
-    endness <- "SE"
-    fq.dir <-  dirname(filenames[1,1])
-  } else if(dim(filenames)[2] == 2){
-    endness <- "PE"
-    fq.dir <- dirname(filenames$FileName1[1])
-  }
+  #if(dim(filenames)[2] == 1){
+  #  endness <- "SE"
+  #  fq.dir <-  dirname(filenames[1,1])
+  #} else if(dim(filenames)[2] == 2){
+  #  endness <- "PE"
+  # fq.dir <- dirname(filenames$FileName1[1])
+  #}
 
   sampleFile <- file.path(outdir, "sampleFile.txt")
   rawfileName <- as.data.frame(sapply(filenames, function(x) basename(x)))
